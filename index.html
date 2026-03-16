@@ -3,6 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        try {
+          var storedTheme = localStorage.getItem('theme');
+          var initialTheme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'dark';
+          document.documentElement.setAttribute('data-theme', initialTheme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
 
     <!-- Primary SEO -->
     <title>Janmejay S Purohit – Full Stack Developer &amp; Software Engineer</title>

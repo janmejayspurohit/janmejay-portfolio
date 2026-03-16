@@ -77,17 +77,6 @@ export default function Navbar() {
           JSP
         </Link>
 
-        <button
-          className={`nav-toggle${menuOpen ? ' open' : ''}`}
-          onClick={() => setMenuOpen((o) => !o)}
-          aria-expanded={menuOpen}
-          aria-label="Toggle navigation"
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
         <ul className={`nav-menu${menuOpen ? ' open' : ''}`} role="list">
           {NAV_LINKS.map(({ to, label, end }) => (
             <li key={to}>
@@ -103,23 +92,36 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <button
-          type="button"
-          className={`theme-toggle ${theme === 'dark' ? 'is-dark' : 'is-light'}`}
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
-        >
-          <span className="theme-icon-wrap" aria-hidden="true">
-            <svg className="theme-icon sun" viewBox="0 0 24 24" focusable="false">
-              <circle cx="12" cy="12" r="4.2" />
-              <path d="M12 2.2v2.4M12 19.4v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7" />
-            </svg>
-            <svg className="theme-icon moon" viewBox="0 0 24 24" focusable="false">
-              <path d="M20.2 14.7a8.8 8.8 0 1 1-10.9-10.9 7.2 7.2 0 1 0 10.9 10.9Z" />
-            </svg>
-          </span>
-        </button>
+        <div className="nav-actions">
+          <button
+            type="button"
+            className={`theme-toggle ${theme === 'dark' ? 'is-dark' : 'is-light'}`}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
+          >
+            <span className="theme-icon-wrap" aria-hidden="true">
+              <svg className="theme-icon sun" viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="4.2" />
+                <path d="M12 2.2v2.4M12 19.4v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7" />
+              </svg>
+              <svg className="theme-icon moon" viewBox="0 0 24 24" focusable="false">
+                <path d="M20.2 14.7a8.8 8.8 0 1 1-10.9-10.9 7.2 7.2 0 1 0 10.9 10.9Z" />
+              </svg>
+            </span>
+          </button>
+
+          <button
+            className={`nav-toggle${menuOpen ? ' open' : ''}`}
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-expanded={menuOpen}
+            aria-label="Toggle navigation"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
     </nav>
   );
