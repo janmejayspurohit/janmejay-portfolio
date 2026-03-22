@@ -1,5 +1,4 @@
 import Seo from '../components/Seo';
-import PageBanner from '../components/PageBanner';
 import Resume from '../components/Resume';
 import Skills from '../components/Skills';
 import Qualification from '../components/Qualification';
@@ -12,10 +11,6 @@ export default function ResumePage() {
         title="Janmejay S Purohit - Resume & Skills"
         description="Resume, technical skills, and educational qualifications of Janmejay S Purohit."
         canonicalPath="/resume"
-      />
-      <PageBanner
-        title="Resume, Skills & Qualification"
-        subtitle="Professional profile, technology stack, and academic journey."
       />
       <Resume />
       <Skills />

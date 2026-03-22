@@ -3,43 +3,65 @@ import { useScrollAnimation } from '../hooks/useScrollAnimation';
 const EXPERIENCES = [
   {
     id: 1,
+    company: 'T-Mobile',
+    url: 'https://www.t-mobile.com/',
+    role: 'Lead Developer - Contract',
+    period: 'Dec 2024 - Present',
+    logo: '/img/logos/tmo.png',
+    description:
+      'Leading development initiatives and building production solutions with modern frontend and backend stacks.',
+    tech: ['AEM', 'Alpine JS', 'Nx', 'Hapi.js', 'Angular', 'Spring Boot', 'PostgreSQL', 'Claude Code'],
+  },
+  {
+    id: 2,
+    company: 'Indiana University Bloomington',
+    url: 'https://bloomington.iu.edu/',
+    role: 'M.S. in Computer Science',
+    period: 'Aug 2022 - Nov 2024',
+    logo: '/img/logos/iu.png',
+    description:
+      'Completed graduate studies in Computer Science with focus on advanced software engineering and systems foundations.',
+    tech: ['Computer Science', 'Graduate Studies'],
+  },
+  {
+    id: 3,
     company: 'Tesark Technologies',
     url: 'https://www.tesark.com/',
     role: 'Software Engineer',
-    period: 'Sep 2019 – Jun 2022',
+    period: 'Sep 2019 - Jun 2022',
     logo: '/img/logos/tesark.png',
     description:
       'Full stack development of various in-house products and services — building new features, improving existing systems, and resolving bugs across the stack.',
     tech: ['ReactJS', 'NodeJS', 'Ruby on Rails', 'Redis', 'PostgreSQL', 'Metabase'],
   },
   {
-    id: 2,
+    id: 4,
     company: 'Box8',
     url: 'https://box8.in/',
     role: 'Software Developer Intern',
-    period: 'Jan 2019 – Aug 2019',
+    period: 'Jan 2019 - Aug 2019',
     logo: '/img/logos/box8.png',
     description:
       'Worked in the Payments Team — developed and integrated customer-side payment systems (AmazonPay, PhonePe, Paytm, GooglePay) via server-to-server communication, data storage, and API development. Also handled in-house software development and bug fixes.',
     tech: ['Ruby on Rails', 'AngularJS', 'Redis', 'Redash', 'PostgreSQL', 'ELK Stack'],
   },
   {
-    id: 3,
+    id: 5,
     company: 'EzPG',
     url: 'https://www.ezpg.in/aboutus.html',
     role: 'Application Developer Intern',
-    period: 'Jun 2018 – Dec 2018',
+    period: 'Jun 2018 - Dec 2018',
     logo: '/img/logos/ezpg.png',
     description:
       'Built features for a PG (Paying Guest) booking platform — integrating HDFC Bank payment system for accepting payments, application integration, and bug fixes.',
     tech: ['PHP', 'JavaScript', 'jQuery', 'HTML5', 'Bootstrap 4', 'CSS'],
   },
   {
-    id: 4,
+    id: 6,
     company: 'MindIQ',
     url: 'https://www.facebook.com/mindiq.in/',
     role: 'Web Developer Intern',
-    period: 'Jul 2017 – Sep 2017',
+    period: 'Jul 2017 - Sep 2017',
     logo: '/img/logos/mindiq.png',
     description:
       'Built a chatbot platform for business communications. The product featured a pop-up chat interface powered by predefined responses, with a human-takeover capability when the bot reached its limits.',
@@ -51,10 +73,10 @@ export default function WorkExperience() {
   const [ref, visible] = useScrollAnimation();
 
   return (
-    <section id="work" className="section-alt">
+    <section id="experience" className="section-alt">
       <div className="container">
         <div className="section-header">
-          <h2>Work Experience</h2>
+          <h2>Experience</h2>
           <hr />
         </div>
 
@@ -76,6 +98,7 @@ export default function WorkExperience() {
                     alt={exp.company}
                     className="timeline-logo"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div>
                     <h3 className="timeline-company">

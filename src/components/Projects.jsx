@@ -9,7 +9,7 @@ const PROJECTS = [
   },
   {
     id: 2,
-    title: 'Final Year Project – Payment Gateway Integration',
+    title: 'Final Year Project - Payment Gateway Integration',
     desc: 'API integration and back-end development enabling multiple payment gateways (AmazonPay, PhonePe, GooglePay) for a food delivery platform.',
     tech: ['Ruby on Rails', 'PostgreSQL', 'AmazonPay', 'PhonePe', 'REST APIs'],
   },
@@ -21,7 +21,7 @@ const PROJECTS = [
   },
   {
     id: 4,
-    title: 'Virtual Reality App – NASA Space Apps',
+    title: 'Virtual Reality App - NASA Space Apps',
     desc: "Built at NASA Space Apps Hackathon — generates an immersive VR environment based on images captured by NASA's Hubble Telescope.",
     tech: ['VR', 'NASA API', 'Hubble Telescope', 'JavaScript'],
   },
@@ -33,7 +33,7 @@ const PROJECTS = [
   },
   {
     id: 6,
-    title: 'Trash Out – Android App',
+    title: 'Trash Out - Android App',
     desc: "Android app that finds the nearest waste bin using Dijkstra's algorithm and Google Maps API with classifications for Biodegradable, Non-Biodegradable, and Toxic waste. Awarded at Hack2Help Hackathon, DSU 2016.",
     tech: ['Android Studio', 'Java', 'Google Maps API', "Dijkstra's Algorithm", 'GPS'],
   },

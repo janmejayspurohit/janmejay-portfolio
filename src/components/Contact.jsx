@@ -1,7 +1,33 @@
+import { useEffect, useState } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+
+const WORKER_BASE_URL = (import.meta.env.VITE_CONTACT_ENDPOINT || '').replace(/\/$/, '');
 
 export default function Contact() {
   const [ref, visible] = useScrollAnimation();
+  const [visitorCount, setVisitorCount] = useState(null);
+  const [visitorError, setVisitorError] = useState(null);
+
+  useEffect(() => {
+    async function initVisitors() {
+      try {
+        await fetch(`${WORKER_BASE_URL}/api/visitors/hit`, { method: 'POST' });
+
+        const res = await fetch(`${WORKER_BASE_URL}/api/visitors`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error ?? 'Unknown error');
+
+        setVisitorCount(data.count);
+      } catch (e) {
+        console.error('Visitor counter:', e);
+        setVisitorError(true);
+      }
+    }
+
+    initVisitors();
+  }, []);
 
   return (
     <>
@@ -53,8 +79,13 @@ export default function Contact() {
       <div className="copyright-bar">
         <div className="container">
           <p>
-            &copy;&nbsp;
-            <a href="#home">Janmejay S Purohit</a>. All Rights Reserved.
+            &copy;&nbsp;<a href="#home">Janmejay S Purohit</a>. All Rights Reserved.
+            {typeof visitorCount === 'number' && (
+              <>&nbsp;Visitors: <strong>{visitorCount}</strong></>
+            )}
+            {visitorError && (
+              <span style={{ opacity: 0.4 }}>visitor count unavailable</span>
+            )}
           </p>
         </div>
       </div>

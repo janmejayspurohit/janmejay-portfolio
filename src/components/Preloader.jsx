@@ -5,6 +5,17 @@ export default function Preloader() {
   const [mounted,  setMounted]  = useState(true);
 
   useEffect(() => {
+    try {
+      if (sessionStorage.getItem('preloaderSeen') === '1') {
+        setVisible(false);
+        setMounted(false);
+        return;
+      }
+      sessionStorage.setItem('preloaderSeen', '1');
+    } catch {
+      // Continue with timed fallback if storage is unavailable.
+    }
+
     const t1 = setTimeout(() => setVisible(false), 500);
     const t2 = setTimeout(() => setMounted(false), 1000);
     return () => { clearTimeout(t1); clearTimeout(t2); };

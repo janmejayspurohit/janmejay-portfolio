@@ -35,7 +35,7 @@ const SKILLS = [
   { name: 'ELK Stack',      img: '/img/logos/elk.png' },
   { name: 'Kibana',         img: '/img/logos/kibana.png' },
   { name: 'Sentry',         img: '/img/logos/sentry.png' },
-  { name: 'Rollbar',        img: '/img/logos/rollable.png' },
+  { name: 'Rollbar',        img: '/img/logos/rollbar.png' },
   { name: 'Postman',        img: '/img/logos/postman.png' },
   { name: 'Figma',          img: '/img/logos/figma.png' },
   { name: 'Photoshop',      img: '/img/logos/photoshop.png' },
@@ -72,7 +72,7 @@ export default function Skills() {
         >
           {SKILLS.map(({ name, img }) => (
             <div key={name} className="skill-item" title={name}>
-              <img src={img} alt={name} loading="lazy" />
+              <img src={img} alt={name} loading="lazy" decoding="async" />
             </div>
           ))}
         </div>

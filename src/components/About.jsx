@@ -1,7 +1,9 @@
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 function getAge() {
-  const birth = new Date(1997, 9, 29); // Oct 29, 1997
+  const encoded = ['MTk5Nw==', 'OQ==', 'Mjk='];
+  const [year, month, day] = encoded.map((value) => Number.parseInt(atob(value), 10));
+  const birth = new Date(year, month, day);
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();
   if (
@@ -34,7 +36,7 @@ export default function About() {
             <p>
               Feel free to browse around &mdash; if you have any questions or suggestions,
               don&rsquo;t hesitate to reach out via the{' '}
-              <a href="#contact">contact section</a>.
+              <a href="/contact">contact section</a>.
             </p>
 
             <div className="about-meta">
@@ -84,6 +86,7 @@ export default function About() {
               width="260"
               height="260"
               loading="lazy"
+              decoding="async"
             />
           </div>
         </div>

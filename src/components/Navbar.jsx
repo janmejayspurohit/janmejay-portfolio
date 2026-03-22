@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import GoogleTranslate from './GoogleTranslate';
 
 const NAV_LINKS = [
   { to: '/', label: 'Home', end: true },
-  { to: '/work', label: 'Work' },
+  { to: '/experience', label: 'Experience' },
   { to: '/projects', label: 'Projects' },
+  { to: '/apps', label: 'Apps' },
   { to: '/resume', label: 'Resume' },
+  { to: '/contact', label: 'Contact' },
 ];
 
 export default function Navbar() {
@@ -17,7 +20,13 @@ export default function Navbar() {
 
   // Initialize theme from localStorage with system fallback
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme');
+    let storedTheme = null;
+    try {
+      storedTheme = localStorage.getItem('theme');
+    } catch {
+      storedTheme = null;
+    }
+
     const initialTheme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : 'dark';
 
     setTheme(initialTheme);
@@ -27,7 +36,11 @@ export default function Navbar() {
   // Persist and apply theme changes
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch {
+      // Ignore storage write failures in restricted environments.
+    }
 
     if (isFirstThemeRender.current) {
       isFirstThemeRender.current = false;
@@ -46,11 +59,11 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 80);
-      if (menuOpen) setMenuOpen(false);
+      setMenuOpen((open) => (open ? false : open));
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, [menuOpen]);
+  }, []);
 
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -73,7 +86,7 @@ export default function Navbar() {
   return (
     <nav className={`navbar${scrolled ? ' scrolled' : ''}`} aria-label="Main navigation">
       <div className="nav-container">
-        <Link to="/" className="nav-brand" aria-label="Home – Janmejay S Purohit">
+        <Link to="/" className="nav-brand" aria-label="Home - Janmejay S Purohit">
           JSP
         </Link>
 
@@ -93,6 +106,8 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-actions">
+          <GoogleTranslate />
+
           <button
             type="button"
             className={`theme-toggle ${theme === 'dark' ? 'is-dark' : 'is-light'}`}

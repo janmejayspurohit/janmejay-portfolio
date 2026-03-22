@@ -8,6 +8,8 @@ COPY package*.json ./
 # Use deterministic install when lockfile exists; otherwise do a regular install.
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
+ARG VITE_CONTACT_ENDPOINT
+ENV VITE_CONTACT_ENDPOINT=${VITE_CONTACT_ENDPOINT}
 RUN npm run build
 
 # Stage 2: Serve
