@@ -19,7 +19,7 @@ export default function Resume() {
             <i className="far fa-address-card resume-icon" aria-hidden="true" />
             <p>Click below to view or download my full resume.</p>
             <a
-              href="/files/resume-janmejay-v4.pdf"
+              href="/files/resume-janmejay-v5.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="resume-btn"
