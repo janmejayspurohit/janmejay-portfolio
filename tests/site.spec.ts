@@ -802,3 +802,40 @@ test.describe('Name signals', () => {
     await expect(page.locator('link[rel="me"]')).toHaveCount(2);
   });
 });
+
+// User request (2026-09-30): the current-page marker is a straight underline that slides like a slider.
+test.describe('Nav underline slider', () => {
+  const geo = (page: import('@playwright/test').Page, href: string) =>
+    page.evaluate((h) => {
+      const bar = document.querySelector('.nav-underline')!.getBoundingClientRect();
+      const link = document.querySelector(`.nav a[href="${h}"]`)!.getBoundingClientRect();
+      return { dLeft: Math.abs(bar.left - (link.left + 12)), dWidth: Math.abs(bar.width - (link.width - 24)), height: bar.height };
+    }, href);
+
+  test('sits under the current page, slides to the hovered link, and returns', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 800 });
+    await page.goto('/experience');
+    await expect(page.locator('.nav-underline')).toHaveCount(1);
+    await expect(page.locator('.nav a[aria-current="page"] .nav-underline')).toHaveCount(1);
+    let g = await geo(page, '/experience');
+    expect(g.dLeft).toBeLessThanOrEqual(1);
+    expect(g.dWidth).toBeLessThanOrEqual(1);
+    expect(g.height).toBe(2);
+
+    await page.hover('.nav a[href="/contact"]');
+    await expect.poll(async () => (await geo(page, '/contact')).dLeft, { timeout: 3000 }).toBeLessThanOrEqual(1);
+    expect((await geo(page, '/contact')).dWidth).toBeLessThanOrEqual(1);
+
+    await page.mouse.move(700, 500);
+    await expect.poll(async () => (await geo(page, '/experience')).dLeft, { timeout: 3000 }).toBeLessThanOrEqual(1);
+  });
+
+  test('is named for the page-to-page slide and moves to the new page', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 800 });
+    await page.goto('/experience');
+    await expect(page.locator('.nav-underline')).toHaveCSS('view-transition-name', 'nav-underline');
+    await page.click('.nav a[href="/resume"]');
+    await expect(page).toHaveURL(/\/resume$/);
+    await expect.poll(async () => (await geo(page, '/resume')).dLeft, { timeout: 3000 }).toBeLessThanOrEqual(1);
+  });
+});
