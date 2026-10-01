@@ -1,3 +1,7 @@
 node_modules
 dist
+dist-test
+.astro
 .git
+test-results
+playwright-report
