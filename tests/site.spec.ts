@@ -406,3 +406,24 @@ test.describe('Portfolio Routes', () => {
     }
   });
 });
+// User rule (2026-09-30): "always keep the snake head with arrow leg half of the rest of the fragments".
+test.describe('Career path arrow leg', () => {
+  for (const width of [390, 800, 1440]) {
+    test(`arrow leg is half a gap at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/');
+      const { gap, leg } = await page.evaluate(() => {
+        const ol = document.querySelector('.path') as HTMLElement;
+        const lis = [...ol.querySelectorAll('li')];
+        const o = ol.getBoundingClientRect();
+        const after = getComputedStyle(ol, '::after');
+        const cx = (li: Element) => li.getBoundingClientRect().left - o.left + 6;
+        const narrow = window.innerWidth <= 560;
+        const tip = narrow ? parseFloat(after.left) : o.width - parseFloat(after.right);
+        return { gap: Math.abs(cx(lis[1]) - cx(lis[0])), leg: Math.abs(cx(lis[5]) - tip) };
+      });
+      expect(gap).toBeGreaterThan(0);
+      expect(Math.abs(leg - gap / 2)).toBeLessThanOrEqual(2);
+    });
+  }
+});
