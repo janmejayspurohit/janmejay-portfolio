@@ -406,24 +406,39 @@ test.describe('Portfolio Routes', () => {
     }
   });
 });
-// User rule (2026-09-30): "always keep the snake head with arrow leg half of the rest of the fragments".
-test.describe('Career path arrow leg', () => {
+// User rules (2026-09-30): "always keep the snake head with arrow leg half of the rest of the fragments",
+// "the leg should be half, the arrow after the half", and the path fills the full width of its box.
+test.describe('Career path geometry', () => {
   for (const width of [390, 800, 1440]) {
-    test(`arrow leg is half a gap at ${width}px`, async ({ page }) => {
+    test(`leg is half a gap, arrowhead beyond it, at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/');
-      const { gap, leg } = await page.evaluate(() => {
+      const m = await page.evaluate(() => {
         const ol = document.querySelector('.path') as HTMLElement;
         const lis = [...ol.querySelectorAll('li')];
         const o = ol.getBoundingClientRect();
-        const after = getComputedStyle(ol, '::after');
+        const line = getComputedStyle(ol, '::before');
+        const arrow = getComputedStyle(ol, '::after');
         const cx = (li: Element) => li.getBoundingClientRect().left - o.left + 6;
         const narrow = window.innerWidth <= 560;
-        const tip = narrow ? parseFloat(after.left) : o.width - parseFloat(after.right);
-        return { gap: Math.abs(cx(lis[1]) - cx(lis[0])), leg: Math.abs(cx(lis[5]) - tip) };
+        // where the line (not the arrowhead) ends after the last stop
+        const lineEnd = narrow ? parseFloat(line.left) : o.width - parseFloat(line.right);
+        // where the arrowhead's tip is
+        const tip = narrow ? parseFloat(arrow.left) : o.width - parseFloat(arrow.right);
+        return {
+          narrow,
+          gap: Math.abs(cx(lis[1]) - cx(lis[0])),
+          leg: Math.abs(cx(lis[5]) - lineEnd),
+          arrowBeyondLeg: Math.abs(tip - cx(lis[5])) > Math.abs(lineEnd - cx(lis[5])),
+          firstDotLeft: lis[0].getBoundingClientRect().left - o.left,
+          tipToRightEdge: o.width - tip,
+        };
       });
-      expect(gap).toBeGreaterThan(0);
-      expect(Math.abs(leg - gap / 2)).toBeLessThanOrEqual(2);
+      expect(m.gap).toBeGreaterThan(0);
+      expect(Math.abs(m.leg - m.gap / 2)).toBeLessThanOrEqual(2);
+      expect(m.arrowBeyondLeg).toBe(true);
+      expect(m.firstDotLeft).toBeLessThanOrEqual(1);
+      if (!m.narrow) expect(Math.abs(m.tipToRightEdge)).toBeLessThanOrEqual(1);
     });
   }
 });
