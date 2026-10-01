@@ -25,7 +25,6 @@ export const experience: Experience[] = [
   {
     id: 1,
     company: 'T-Mobile',
-    via: 'via Concentrix',
     url: 'https://www.t-mobile.com/',
     role: 'Lead Developer',
     period: 'Dec 2024 — Present',

@@ -90,33 +90,6 @@ const isCurrent = (href: string) =>
     }
   });
 
-  // Sliding underline: it lives under the current page's link and glides to
-  // whichever link is hovered or focused, then back. (Between pages the browser's
-  // view transition slides it, via its view-transition-name.)
-  const navEl = document.querySelector<HTMLElement>('.nav');
-  const bar = navEl?.querySelector<HTMLElement>('.nav-underline');
-  const home = bar?.parentElement;
-  if (navEl && bar && home) {
-    const moveTo = (link: HTMLElement) => {
-      const from = home.getBoundingClientRect();
-      const to = link.getBoundingClientRect();
-      bar.style.setProperty('--dx', `${to.left - from.left}px`);
-      bar.style.setProperty('--w', `${to.width - 24}px`);
-    };
-    const reset = () => {
-      bar.style.removeProperty('--dx');
-      bar.style.removeProperty('--w');
-    };
-    navEl.querySelectorAll<HTMLElement>('a').forEach((link) => {
-      link.addEventListener('mouseenter', () => moveTo(link));
-      link.addEventListener('focus', () => moveTo(link));
-    });
-    navEl.addEventListener('mouseleave', reset);
-    navEl.addEventListener('focusout', (e) => {
-      if (!navEl.contains(e.relatedTarget as Node | null)) reset();
-    });
-  }
-
   // Close the phone menu when tapping outside it.
   const menu = document.querySelector<HTMLDetailsElement>('.menu');
   document.addEventListener('click', (e) => {

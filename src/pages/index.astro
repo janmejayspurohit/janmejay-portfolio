@@ -1,5 +1,7 @@
 ---
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
+import sharp from 'sharp';
+import { join } from 'node:path';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import portrait from '../assets/portrait.jpg';
@@ -14,12 +16,28 @@ const path = [
   { yr: '2022', org: 'IU' },
   { yr: '2024', org: 'T-Mobile', current: true },
 ];
+// The portrait is the page's largest image, so it is treated as critical:
+// preloaded from <head>, decoded with the first paint, and backed by a tiny
+// blurred copy inlined into the page so the tile is never empty.
+const PHOTO_SIZES = '(max-width: 560px) 100vw, (max-width: 1023px) 50vw, 25vw';
+const WIDTHS = [320, 480, 640, 800];
+// AVIF first (about 40% smaller), WebP for browsers without it.
+const photoAvif = await getImage({ src: portrait, widths: WIDTHS, sizes: PHOTO_SIZES, quality: 55, format: 'avif' });
+const photo = await getImage({ src: portrait, widths: WIDTHS, sizes: PHOTO_SIZES, quality: 72, format: 'webp' });
+// read from the source tree: at build time this file runs from the output folder
+const blur = await sharp(join(process.cwd(), 'src/assets/portrait.jpg'))
+  .resize(24)
+  .webp({ quality: 40 })
+  .toBuffer();
+const blurUrl = `data:image/webp;base64,${blur.toString('base64')}`;
+
 const stack = ['TypeScript', 'Angular', 'Svelte', 'Astro', 'React', 'Node.js', 'Spring Boot', 'PostgreSQL'];
 ---
 <Base
   title="Janmejay S Purohit | Full Stack Software Engineer"
   description="Janmejay S Purohit: full stack software engineer and Lead Developer at T-Mobile, building fast, accessible web products with Angular, Svelte, Astro and Node.js."
 >
+  <link slot="head" rel="preload" as="image" type="image/avif" imagesrcset={photoAvif.srcSet.attribute} imagesizes={PHOTO_SIZES} fetchpriority="high" />
   <div class="wrap home">
     <div class="bento">
       <section class="tile t-hero" aria-labelledby="hero-name">
@@ -35,14 +53,27 @@ const stack = ['TypeScript', 'Angular', 'Svelte', 'Astro', 'React', 'Node.js', '
         </div>
       </section>
 
-      <div class="tile t-photo">
-        <Image src={portrait} alt="Janmejay S Purohit in front of the U.S. Capitol" widths={[320, 480, 640, 800]} sizes="(max-width: 560px) 100vw, (max-width: 1023px) 50vw, 25vw" loading="eager" fetchpriority="high" />
+      <div class="tile t-photo" style={`background-image:url(${blurUrl})`}>
+        <picture>
+          <source type="image/avif" srcset={photoAvif.srcSet.attribute} sizes={PHOTO_SIZES} />
+          <img
+            src={photo.src}
+            srcset={photo.srcSet.attribute}
+            sizes={PHOTO_SIZES}
+            width={portrait.width}
+            height={portrait.height}
+            alt="Janmejay S Purohit in front of the U.S. Capitol"
+            loading="eager"
+            decoding="sync"
+            fetchpriority="high"
+          />
+        </picture>
       </div>
 
       <a class="tile t-now" href="/experience">
         <span class="label status"><span class="status-dot"></span>Now</span>
         <span class="big">Lead Developer</span>
-        <span class="small">T-Mobile, via Concentrix · since Dec 2024</span>
+        <span class="small">T-Mobile · since Dec 2024</span>
         <span class="tile-link-arrow"><Icon name="lucide:arrow-up-right" /></span>
       </a>
 
@@ -63,7 +94,6 @@ const stack = ['TypeScript', 'Angular', 'Svelte', 'Astro', 'React', 'Node.js', '
             </li>
           ))}
         </ol>
-        <span class="small">From web internships in Bangalore to leading development at T-Mobile.</span>
       </section>
 
       <div class="tile t-lang">

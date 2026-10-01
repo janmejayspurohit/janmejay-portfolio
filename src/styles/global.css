@@ -162,16 +162,14 @@ ul { margin: 0; }
 .nav a {
   color: var(--fg-soft); font-size: 0.9rem; font-weight: 500; padding: 6px 12px; border-radius: 8px;
 }
-.nav a:hover { color: var(--fg-strong); text-decoration: none; }
-/* Current page: a straight underline under the label. It is one real element, so
-   it can slide: to the hovered link (script sets --dx / --w) and, between pages,
-   from the old tab to the new one (the browser animates its view-transition-name). */
+.nav a:hover { color: var(--fg-strong); background: var(--surface); text-decoration: none; }
+/* Current page: a straight underline under the label. It stays put on hover and
+   slides only on navigation: it is a real element in each page's HTML with a
+   view-transition-name, so the browser animates it from the old tab to the new one. */
 .nav a { position: relative; }
 .nav a[aria-current='page'] { color: var(--fg-strong); }
 .nav-underline {
-  position: absolute; left: 12px; bottom: 0; height: 2px; width: var(--w, calc(100% - 24px));
-  background: var(--accent); transform: translateX(var(--dx, 0px));
-  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), width 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+  position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; background: var(--accent);
   view-transition-name: nav-underline; pointer-events: none;
 }
 ::view-transition-group(nav-underline) { animation-duration: 0.35s; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
@@ -278,7 +276,10 @@ a.tile:hover .tile-link-arrow { color: var(--accent); }
 .status { display: inline-flex; align-items: center; gap: 8px; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mark); box-shadow: 0 0 0 4px color-mix(in srgb, var(--mark) 22%, transparent); }
 
-.t-photo { grid-area: photo; padding: 0; justify-content: flex-end; }
+/* The blurred inline copy (set as background-image in the markup) shows until the photo paints over it. */
+.t-photo { grid-area: photo; padding: 0; justify-content: flex-end; background-size: cover; background-position: 56% 38%; }
+/* the photo does not take part in the tiles' entrance fade (needs the extra class to outrank that rule) */
+.bento > .tile.t-photo { animation: none; }
 .t-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 56% 38%; }
 
 .t-now { grid-area: now; }

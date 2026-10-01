@@ -118,6 +118,7 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={`${site.name}, ${site.role}`} />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
