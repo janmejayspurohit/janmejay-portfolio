@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <rect width="96" height="96" rx="20" fill="#010126"/>
+  <rect x="3" y="3" width="90" height="90" rx="17" fill="none" stroke="#f2c230" stroke-width="3"/>
+  <text x="48" y="68" text-anchor="middle" font-family="Geist, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="58" font-weight="700" fill="#f2c230">J</text>
+</svg>

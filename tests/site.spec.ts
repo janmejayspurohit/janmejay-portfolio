@@ -60,12 +60,12 @@ test.describe('Portfolio Routes', () => {
       // Check canonical link
       const canonical = await page.locator('link[rel="canonical"]').first();
       expect(canonical).toBeTruthy();
-      expect(await canonical.getAttribute('href')).toBe(`https://www.janmejay.info${route === '/' ? '/' : route}`);
+      expect(await canonical.getAttribute('href')).toBe(`https://janmejay.info${route === '/' ? '/' : route}`);
       
       // Check og:image
       const ogImage = await page.locator('meta[property="og:image"]').first();
       expect(ogImage).toBeTruthy();
-      expect(await ogImage.getAttribute('content')).toBe('https://www.janmejay.info/og.png');
+      expect(await ogImage.getAttribute('content')).toBe('https://janmejay.info/og.png');
     });
   }
 
@@ -172,6 +172,12 @@ test.describe('Portfolio Routes', () => {
               break;
             case 'ico':
               expectedContentType = 'image/x-icon';
+              break;
+            case 'xml':
+              expectedContentType = 'application/xml';
+              break;
+            case 'txt':
+              expectedContentType = 'text/plain';
               break;
             default:
               expectedContentType = 'application/octet-stream';
@@ -521,7 +527,7 @@ test.describe('SEO', () => {
     const body = await response.text();
     expect(body).toContain('User-agent: *');
     expect(body).toContain('Allow: /');
-    expect(body).toContain('Sitemap: https://www.janmejay.info/sitemap.xml');
+    expect(body).toContain('Sitemap: https://janmejay.info/sitemap.xml');
     expect(body).not.toContain('Disallow: /');
   });
 
@@ -539,7 +545,7 @@ test.describe('SEO', () => {
     expect(locUrls.length).toBe(6);
     
     // Check that all URLs are canonical
-    const expectedCanonicals = ROUTES.map(route => `https://www.janmejay.info${route === '/' ? '/' : route}`);
+    const expectedCanonicals = ROUTES.map(route => `https://janmejay.info${route === '/' ? '/' : route}`);
     expect(new Set(locUrls)).toEqual(new Set(expectedCanonicals));
     
     // Check <lastmod> values
@@ -569,7 +575,7 @@ test.describe('SEO', () => {
       // Check canonical
       const canonical = await page.locator('link[rel="canonical"]').first();
       expect(canonical).toBeTruthy();
-      const expectedCanonical = `https://www.janmejay.info${route === '/' ? '/' : route}`;
+      const expectedCanonical = `https://janmejay.info${route === '/' ? '/' : route}`;
       expect(await canonical.getAttribute('href')).toBe(expectedCanonical);
       
       // Check meta robots
@@ -692,12 +698,8 @@ test.describe('SEO', () => {
       const scriptContent = await scripts[0].textContent();
       expect(scriptContent).toBeDefined();
       
-      let jsonData;
-      try {
-        jsonData = JSON.parse(scriptContent!);
-      } catch (e) {
-        expect.fail('Invalid JSON in structured data');
-      }
+      // JSON.parse throws on invalid structured data, which fails the test.
+      const jsonData = JSON.parse(scriptContent!);
       
       expect(jsonData['@context']).toBe('https://schema.org');
       expect(Array.isArray(jsonData['@graph'])).toBe(true);
@@ -708,7 +710,7 @@ test.describe('SEO', () => {
       const personObj = graph.find((obj: any) => obj['@type'] === 'Person');
       expect(personObj).toBeDefined();
       expect(personObj.name).toBe('Janmejay S Purohit');
-      expect(personObj.url).toBe('https://www.janmejay.info');
+      expect(personObj.url).toBe('https://janmejay.info');
       expect(Array.isArray(personObj.sameAs)).toBe(true);
       expect(personObj.sameAs).toContain('https://www.linkedin.com/in/jsp324/');
       expect(personObj.sameAs).toContain('https://github.com/janmejayspurohit');
@@ -731,14 +733,14 @@ test.describe('SEO', () => {
         // On other routes, check for WebPage and BreadcrumbList
         const webPageObj = graph.find((obj: any) => obj['@type'] === 'WebPage');
         expect(webPageObj).toBeDefined();
-        expect(webPageObj.url).toBe(`https://www.janmejay.info${route === '/' ? '/' : route}`);
+        expect(webPageObj.url).toBe(`https://janmejay.info${route === '/' ? '/' : route}`);
         
         // Check BreadcrumbList
         const breadcrumbObj = graph.find((obj: any) => obj['@type'] === 'BreadcrumbList');
         expect(breadcrumbObj).toBeDefined();
         expect(Array.isArray(breadcrumbObj.itemListElement)).toBe(true);
         expect(breadcrumbObj.itemListElement.length).toBe(2);
-        expect(breadcrumbObj.itemListElement[1].item).toBe(`https://www.janmejay.info${route === '/' ? '/' : route}`);
+        expect(breadcrumbObj.itemListElement[1].item).toBe(`https://janmejay.info${route === '/' ? '/' : route}`);
       }
     }
   });

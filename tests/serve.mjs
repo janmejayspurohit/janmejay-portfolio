@@ -27,6 +27,8 @@ const mimeTypes = {
   '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.pdf': 'application/pdf',
+  '.xml': 'application/xml; charset=utf-8',
+  '.txt': 'text/plain; charset=utf-8',
   '.woff2': 'font/woff2',
   '.ico': 'image/x-icon'
 };

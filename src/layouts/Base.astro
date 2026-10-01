@@ -5,33 +5,67 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import BackToTop from '../components/BackToTop.astro';
-import { site } from '../data/site';
+import { nav, site } from '../data/site';
 
 interface Props {
   title: string;
   description: string;
+  /** Keep a page out of search results (used by the 404 page). */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const canonical = new URL(path, site.url).href;
 const ogImage = new URL(site.ogImage, site.url).href;
+const isHome = path === '/';
+const crumb = nav.find((n) => n.href === path)?.label;
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: site.name,
-  url: site.url,
-  image: new URL(site.portraitUrl, site.url).href,
-  sameAs: [site.linkedin, site.github],
-  jobTitle: site.role,
-  email: site.email,
-  alumniOf: [
-    { '@type': 'CollegeOrUniversity', name: 'Indiana University Bloomington' },
-    { '@type': 'CollegeOrUniversity', name: 'Dayananda Sagar University' },
-  ],
-  knowsLanguage: ['English', 'Kannada', 'Hindi', 'Japanese'],
-};
+// Structured data: who the site is about, the site itself, this page, and where it sits.
+const personId = `${site.url}/#person`;
+const websiteId = `${site.url}/#website`;
+const graph: Record<string, unknown>[] = [
+  {
+    '@type': 'Person',
+    '@id': personId,
+    name: site.name,
+    url: site.url,
+    image: new URL(site.portraitUrl, site.url).href,
+    jobTitle: site.role,
+    description: 'Full stack software engineer and graphic designer. Lead Developer at T-Mobile.',
+    email: site.email,
+    sameAs: [site.linkedin, site.github],
+    address: { '@type': 'PostalAddress', addressCountry: 'US' },
+    alumniOf: [
+      { '@type': 'CollegeOrUniversity', name: 'Indiana University Bloomington', url: 'https://bloomington.iu.edu/' },
+      { '@type': 'CollegeOrUniversity', name: 'Dayananda Sagar University' },
+    ],
+    knowsAbout: ['TypeScript', 'JavaScript', 'Svelte', 'Astro', 'React', 'Angular', 'Node.js', 'Web performance', 'Web accessibility'],
+    knowsLanguage: ['English', 'Kannada', 'Hindi', 'Japanese'],
+  },
+  { '@type': 'WebSite', '@id': websiteId, url: site.url, name: site.name, inLanguage: 'en', publisher: { '@id': personId } },
+  {
+    '@type': isHome ? 'ProfilePage' : 'WebPage',
+    '@id': `${canonical}#webpage`,
+    url: canonical,
+    name: title,
+    description,
+    inLanguage: 'en',
+    isPartOf: { '@id': websiteId },
+    about: { '@id': personId },
+    ...(isHome ? { mainEntity: { '@id': personId } } : {}),
+  },
+];
+if (!isHome && crumb) {
+  graph.push({
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', site.url).href },
+      { '@type': 'ListItem', position: 2, name: crumb, item: canonical },
+    ],
+  });
+}
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
 ---
 <!doctype html>
 <html lang="en" data-theme="dark">
@@ -50,22 +84,30 @@ const jsonLd = {
     </script>
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="keywords" content="Janmejay Purohit, Full Stack Developer, Software Engineer, Svelte, Astro, Angular, ReactJS, Node.js, Ruby on Rails, Python, Portfolio" />
     <meta name="author" content={site.name} />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
     <meta name="theme-color" content="#010126" />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" href="/j.png" type="image/png" />
-    <meta property="og:type" content="website" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png" />
+    <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content={isHome ? 'profile' : 'website'} />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name}, ${site.role}`} />
     <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en_US" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={`${site.name}, ${site.role}`} />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://janmejay.info/sitemap.xml

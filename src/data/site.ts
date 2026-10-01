@@ -1,6 +1,6 @@
 export const site = {
   name: 'Janmejay S Purohit',
-  url: 'https://www.janmejay.info',
+  url: 'https://janmejay.info',
   role: 'Full Stack Software Engineer',
   email: 'janmejayspurohit@gmail.com',
   github: 'https://github.com/janmejayspurohit',
@@ -8,7 +8,7 @@ export const site = {
   resume: '/files/resume-janmejay-v5.pdf',
   location: 'United States',
   languages: ['English', 'ಕನ್ನಡ', 'हिंदी', '日本語'],
-  ogImage: '/img/logos/home.jpg',
+  ogImage: '/og.png',
   portraitUrl: '/img/misc/janmejay.jpg',
 };
 
