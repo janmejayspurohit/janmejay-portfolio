@@ -21,12 +21,14 @@ import { site } from '../data/site';
     {experience.map((e) => (
       <li class:list={['row', { current: e.period.includes('Present') }]}>
         <div>
-          <div class="row-date">{e.period}</div>
           <div class="row-head">
-            <Image class="row-logo" src={e.logo} alt="" width={28} height={28} />
-            <h2 class="row-title">
-              {e.role}<span class="sep">·</span><a href={e.url} target="_blank" rel="noopener noreferrer">{e.company} ↗</a>
-            </h2>
+            <Image class="row-logo" src={e.logo} alt="" width={44} height={44} />
+            <div class="row-heading">
+              <h2 class="row-title">
+                {e.role}<span class="sep">·</span><a href={e.url} target="_blank" rel="noopener noreferrer">{e.company} ↗</a>
+              </h2>
+              <div class="row-date">{e.period}</div>
+            </div>
           </div>
           {e.via && <div class="row-sub">{e.via}</div>}
           <p class="row-summary">{e.summary}</p>
