@@ -10,12 +10,12 @@ const routes = [
 ];
 
 const expectedTitles = {
-  '/': 'Janmejay S Purohit - Home',
-  '/experience': 'Janmejay S Purohit - Experience',
-  '/projects': 'Janmejay S Purohit - Projects',
-  '/apps': 'Janmejay S Purohit - Apps',
-  '/resume': 'Janmejay S Purohit - Resume & Skills',
-  '/contact': 'Janmejay S Purohit - Contact'
+  '/': 'Janmejay S Purohit | Full Stack Software Engineer',
+  '/experience': 'Experience | Janmejay S Purohit',
+  '/projects': 'Projects | Janmejay S Purohit',
+  '/apps': 'Apps | Janmejay S Purohit',
+  '/resume': 'Resume & Skills | Janmejay S Purohit',
+  '/contact': 'Contact | Janmejay S Purohit'
 };
 
 test.beforeEach(async ({ page }) => {
@@ -65,7 +65,7 @@ test.describe('Portfolio Routes', () => {
       // Check og:image
       const ogImage = await page.locator('meta[property="og:image"]').first();
       expect(ogImage).toBeTruthy();
-      expect(await ogImage.getAttribute('content')).toBe('https://www.janmejay.info/img/logos/home.jpg');
+      expect(await ogImage.getAttribute('content')).toBe('https://www.janmejay.info/og.png');
     });
   }
 
@@ -507,5 +507,275 @@ test.describe('Experience roadmap', () => {
       const c = getComputedStyle(probe).color; probe.remove(); return c;
     }));
     expect(await row.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(before);
+  });
+});
+
+test.describe('SEO', () => {
+  const ROUTES = ['/', '/experience', '/projects', '/apps', '/resume', '/contact'];
+  
+  test('robots.txt', async ({ page }) => {
+    const response = await page.request.get('/robots.txt');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('text/plain');
+    
+    const body = await response.text();
+    expect(body).toContain('User-agent: *');
+    expect(body).toContain('Allow: /');
+    expect(body).toContain('Sitemap: https://www.janmejay.info/sitemap.xml');
+    expect(body).not.toContain('Disallow: /');
+  });
+
+  test('sitemap.xml', async ({ page }) => {
+    const response = await page.request.get('/sitemap.xml');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('xml');
+    
+    const body = await response.text();
+    
+    // Extract <loc> values
+    const locMatches = body.match(/<loc>(.*?)<\/loc>/g);
+    expect(locMatches).toBeDefined();
+    const locUrls = locMatches!.map(match => match.replace(/<\/?loc>/g, ''));
+    expect(locUrls.length).toBe(6);
+    
+    // Check that all URLs are canonical
+    const expectedCanonicals = ROUTES.map(route => `https://www.janmejay.info${route === '/' ? '/' : route}`);
+    expect(new Set(locUrls)).toEqual(new Set(expectedCanonicals));
+    
+    // Check <lastmod> values
+    const lastmodMatches = body.match(/<lastmod>(.*?)<\/lastmod>/g);
+    expect(lastmodMatches).toBeDefined();
+    expect(lastmodMatches!.length).toBe(6);
+    
+    // Validate date format (YYYY-MM-DD)
+    for (const match of lastmodMatches!) {
+      const dateStr = match.replace(/<\/?lastmod>/g, '');
+      expect(dateStr).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+  });
+
+  test('Head tags for all routes', async ({ page }) => {
+    // Collect titles and descriptions for uniqueness check
+    const titles: string[] = [];
+    const descriptions: string[] = [];
+    
+    for (const route of ROUTES) {
+      await page.goto(route);
+      
+      // Check <html lang>
+      const htmlLang = await page.locator('html').first();
+      expect(await htmlLang.getAttribute('lang')).toBe('en');
+      
+      // Check canonical
+      const canonical = await page.locator('link[rel="canonical"]').first();
+      expect(canonical).toBeTruthy();
+      const expectedCanonical = `https://www.janmejay.info${route === '/' ? '/' : route}`;
+      expect(await canonical.getAttribute('href')).toBe(expectedCanonical);
+      
+      // Check meta robots
+      const robotsMeta = await page.locator('meta[name="robots"]').first();
+      expect(robotsMeta).toBeTruthy();
+      const robotsContent = await robotsMeta.getAttribute('content');
+      expect(robotsContent).toContain('index');
+      expect(robotsContent).not.toContain('noindex');
+      
+      // Check title length (at most 60 characters)
+      const title = await page.title();
+      expect(title.length).toBeLessThanOrEqual(60);
+      titles.push(title);
+      
+      // Check meta description length (between 110 and 160 inclusive)
+      const descriptionMeta = await page.locator('meta[name="description"]').first();
+      expect(descriptionMeta).toBeTruthy();
+      const descriptionContent = await descriptionMeta.getAttribute('content');
+      expect(descriptionContent).toBeDefined();
+      expect(descriptionContent!.length).toBeGreaterThanOrEqual(110);
+      expect(descriptionContent!.length).toBeLessThanOrEqual(160);
+      descriptions.push(descriptionContent!);
+      
+      // Check og:title
+      const ogTitle = await page.locator('meta[property="og:title"]').first();
+      expect(ogTitle).toBeTruthy();
+      expect(await ogTitle.getAttribute('content')).toBe(title);
+      
+      // Check og:description
+      const ogDescription = await page.locator('meta[property="og:description"]').first();
+      expect(ogDescription).toBeTruthy();
+      expect(await ogDescription.getAttribute('content')).toBe(descriptionContent);
+      
+      // Check og:url
+      const ogUrl = await page.locator('meta[property="og:url"]').first();
+      expect(ogUrl).toBeTruthy();
+      expect(await ogUrl.getAttribute('content')).toBe(expectedCanonical);
+      
+      // Check og:image dimensions
+      const ogImageWidth = await page.locator('meta[property="og:image:width"]').first();
+      expect(ogImageWidth).toBeTruthy();
+      expect(await ogImageWidth.getAttribute('content')).toBe('1200');
+      
+      const ogImageHeight = await page.locator('meta[property="og:image:height"]').first();
+      expect(ogImageHeight).toBeTruthy();
+      expect(await ogImageHeight.getAttribute('content')).toBe('630');
+      
+      // Check twitter:card
+      const twitterCard = await page.locator('meta[name="twitter:card"]').first();
+      expect(twitterCard).toBeTruthy();
+      expect(await twitterCard.getAttribute('content')).toBe('summary_large_image');
+    }
+    
+    // Check that all titles and descriptions are unique
+    expect(new Set(titles).size).toBe(6);
+    expect(new Set(descriptions).size).toBe(6);
+  });
+
+  test('Share image', async ({ page }) => {
+    const response = await page.request.get('/og.png');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toBe('image/png');
+    
+    // Check PNG dimensions (1200x630)
+    const body = await response.body();
+    const width = body.readUInt32BE(16);
+    const height = body.readUInt32BE(20);
+    expect(width).toBe(1200);
+    expect(height).toBe(630);
+  });
+
+  test('Favicons', async ({ page }) => {
+    // Check favicon.svg
+    const svgResponse = await page.request.get('/favicon.svg');
+    expect(svgResponse.status()).toBe(200);
+    expect(svgResponse.headers()['content-type']).toContain('svg');
+    
+    // Check favicon-48.png
+    const png48Response = await page.request.get('/favicon-48.png');
+    expect(png48Response.status()).toBe(200);
+    expect(png48Response.headers()['content-type']).toBe('image/png');
+    
+    const png48Body = await png48Response.body();
+    const png48Width = png48Body.readUInt32BE(16);
+    const png48Height = png48Body.readUInt32BE(20);
+    expect(png48Width).toBe(48);
+    expect(png48Height).toBe(48);
+    
+    // Check apple-touch-icon.png
+    const appleTouchResponse = await page.request.get('/apple-touch-icon.png');
+    expect(appleTouchResponse.status()).toBe(200);
+    expect(appleTouchResponse.headers()['content-type']).toBe('image/png');
+    
+    const appleTouchBody = await appleTouchResponse.body();
+    const appleTouchWidth = appleTouchBody.readUInt32BE(16);
+    const appleTouchHeight = appleTouchBody.readUInt32BE(20);
+    expect(appleTouchWidth).toBe(180);
+    expect(appleTouchHeight).toBe(180);
+    
+    // Check link tags on homepage
+    await page.goto('/');
+    const faviconLink = await page.locator('link[rel="icon"][type="image/svg+xml"]');
+    expect(faviconLink).toBeTruthy();
+    expect(await faviconLink.getAttribute('href')).toBe('/favicon.svg');
+    
+    const appleTouchLink = await page.locator('link[rel="apple-touch-icon"]');
+    expect(appleTouchLink).toBeTruthy();
+    expect(await appleTouchLink.getAttribute('href')).toBe('/apple-touch-icon.png');
+  });
+
+  test('Structured data', async ({ page }) => {
+    for (const route of ROUTES) {
+      await page.goto(route);
+      
+      // Get all script[type="application/ld+json"]
+      const scripts = await page.locator('script[type="application/ld+json"]').all();
+      expect(scripts.length).toBe(1);
+      
+      // Parse JSON and check structure
+      const scriptContent = await scripts[0].textContent();
+      expect(scriptContent).toBeDefined();
+      
+      let jsonData;
+      try {
+        jsonData = JSON.parse(scriptContent!);
+      } catch (e) {
+        expect.fail('Invalid JSON in structured data');
+      }
+      
+      expect(jsonData['@context']).toBe('https://schema.org');
+      expect(Array.isArray(jsonData['@graph'])).toBe(true);
+      
+      const graph = jsonData['@graph'];
+      
+      // Find Person object
+      const personObj = graph.find((obj: any) => obj['@type'] === 'Person');
+      expect(personObj).toBeDefined();
+      expect(personObj.name).toBe('Janmejay S Purohit');
+      expect(personObj.url).toBe('https://www.janmejay.info');
+      expect(Array.isArray(personObj.sameAs)).toBe(true);
+      expect(personObj.sameAs).toContain('https://www.linkedin.com/in/jsp324/');
+      expect(personObj.sameAs).toContain('https://github.com/janmejayspurohit');
+      expect(personObj).not.toHaveProperty('telephone');
+      
+      // Find WebSite object
+      const websiteObj = graph.find((obj: any) => obj['@type'] === 'WebSite');
+      expect(websiteObj).toBeDefined();
+      
+      // Check specific route requirements
+      if (route === '/') {
+        // On homepage, check for ProfilePage
+        const profilePageObj = graph.find((obj: any) => obj['@type'] === 'ProfilePage');
+        expect(profilePageObj).toBeDefined();
+        expect(profilePageObj.mainEntity['@id']).toBe(personObj['@id']);
+        // No BreadcrumbList expected on homepage
+        const breadcrumbObj = graph.find((obj: any) => obj['@type'] === 'BreadcrumbList');
+        expect(breadcrumbObj).toBeUndefined();
+      } else {
+        // On other routes, check for WebPage and BreadcrumbList
+        const webPageObj = graph.find((obj: any) => obj['@type'] === 'WebPage');
+        expect(webPageObj).toBeDefined();
+        expect(webPageObj.url).toBe(`https://www.janmejay.info${route === '/' ? '/' : route}`);
+        
+        // Check BreadcrumbList
+        const breadcrumbObj = graph.find((obj: any) => obj['@type'] === 'BreadcrumbList');
+        expect(breadcrumbObj).toBeDefined();
+        expect(Array.isArray(breadcrumbObj.itemListElement)).toBe(true);
+        expect(breadcrumbObj.itemListElement.length).toBe(2);
+        expect(breadcrumbObj.itemListElement[1].item).toBe(`https://www.janmejay.info${route === '/' ? '/' : route}`);
+      }
+    }
+  });
+
+  test('404 noindex', async ({ page }) => {
+    await page.goto('/definitely-not-a-page');
+    
+    const robotsMeta = await page.locator('meta[name="robots"]').first();
+    expect(robotsMeta).toBeTruthy();
+    const robotsContent = await robotsMeta.getAttribute('content');
+    expect(robotsContent).toContain('noindex');
+  });
+
+  test('Privacy - phone number not exposed', async ({ page }) => {
+    for (const route of ROUTES) {
+      await page.goto(route);
+      const content = await page.content();
+      expect(content).not.toContain('593-8209');
+      expect(content).not.toContain('5938209');
+      expect(content).not.toContain('(929)');
+    }
+    
+    // Also check 404 page
+    await page.goto('/definitely-not-a-page');
+    const content = await page.content();
+    expect(content).not.toContain('593-8209');
+    expect(content).not.toContain('5938209');
+    expect(content).not.toContain('(929)');
+  });
+
+  test('Images have alt attributes', async ({ page }) => {
+    for (const route of ROUTES) {
+      await page.goto(route);
+      
+      // Check that all img elements have alt attributes
+      const noAltCount = await page.locator('img:not([alt])').count();
+      expect(noAltCount).toBe(0);
+    }
   });
 });
