@@ -542,6 +542,8 @@ a.card:hover .tile-link-arrow { color: var(--accent); }
 .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
 .field [aria-invalid='true'] { border-color: var(--red); }
 .field-error { color: var(--red); font-size: 0.84rem; }
+/* bot-trap field: present in the DOM for bots, out of sight and reach for people */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .form-actions .btn { border: 0; cursor: pointer; font-family: inherit; }
 .form-actions .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }

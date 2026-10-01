@@ -266,9 +266,11 @@ test.describe('Portfolio Routes', () => {
   test('Contact form success handling works', async ({ page }) => {
     await page.goto('/contact');
     
-    // Intercept the contact endpoint to return success
+    // Intercept the contact endpoint to return success, keeping what was sent
+    let sent: any = null;
     await page.route('https://contact.test/', async (route) => {
       if (route.request().method() === 'POST') {
+        sent = route.request().postDataJSON();
         await route.fulfill({ 
           json: { ok: true } 
         });
@@ -283,12 +285,23 @@ test.describe('Portfolio Routes', () => {
     await page.locator('#subject').fill('Hello');
     await page.locator('#message').fill('This is a test message.');
     
-    // Submit the form
+    // A person takes a few seconds; anything faster is treated as a bot.
+    await page.waitForTimeout(3200);
     await page.locator('button[type="submit"]').click();
     
     // Check success message is shown using web-first assertions
     const successMessage = await page.locator('text=Message sent successfully. I will get back to you soon.');
     await expect(successMessage).toBeVisible();
+
+    // The relay receives exactly the Discord payload the old site sent.
+    expect(sent).not.toBeNull();
+    expect(sent.username).toBe('Portfolio Bot');
+    expect(sent.embeds[0].title).toBe('Contact Request');
+    expect(sent.embeds[0].fields.map((f: any) => [f.name, f.value])).toEqual([
+      ['Name', 'Test User'], ['Email', 'test@example.com'], ['Subject', 'Hello'], ['Message', 'This is a test message.'],
+    ]);
+    expect(sent.embeds[0].footer.text).toBe('Sent from janmejay.info/contact');
+    expect(sent.company_website).toBeUndefined();
     
     // Check fields are cleared using web-first assertions
     await expect(page.locator('#name')).toHaveValue('');
@@ -319,6 +332,7 @@ test.describe('Portfolio Routes', () => {
     await page.locator('#message').fill('This is a test message.');
     
     // Submit the form
+    await page.waitForTimeout(3200);
     await page.locator('button[type="submit"]').click();
     
     // Check error message is shown using web-first assertions
@@ -838,5 +852,54 @@ test.describe('Nav underline slider', () => {
     await page.click('.nav a[href="/resume"]');
     await expect(page).toHaveURL(/\/resume$/);
     await expect.poll(async () => (await geo(page, '/resume')).dLeft, { timeout: 3000 }).toBeLessThanOrEqual(1);
+  });
+});
+
+// Bot traps on the contact form: nothing may reach the relay, and the bot sees a normal success.
+test.describe('Contact form bot traps', () => {
+  const fill = async (page: import('@playwright/test').Page) => {
+    await page.locator('#name').fill('Spam Bot');
+    await page.locator('#email').fill('bot@example.com');
+    await page.locator('#subject').fill('Buy now');
+    await page.locator('#message').fill('This is spam, sent by a script.');
+  };
+  const watch = async (page: import('@playwright/test').Page) => {
+    const posts: string[] = [];
+    await page.route('https://contact.test/', async (route) => {
+      if (route.request().method() === 'POST') posts.push(route.request().postData() ?? '');
+      await route.fulfill({ json: { ok: true } });
+    });
+    return posts;
+  };
+
+  test('a filled hidden field drops the message', async ({ page }) => {
+    await page.goto('/contact');
+    const posts = await watch(page);
+    await fill(page);
+    await page.locator('#company-website').evaluate((el: HTMLInputElement) => { el.value = 'https://spam.example'; });
+    await page.waitForTimeout(3200);
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('.form-status')).toHaveText('Message sent successfully. I will get back to you soon.');
+    await page.waitForTimeout(400);
+    expect(posts).toHaveLength(0);
+  });
+
+  test('a form submitted faster than a person can type drops the message', async ({ page }) => {
+    await page.goto('/contact');
+    const posts = await watch(page);
+    await fill(page);
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('.form-status')).toHaveText('Message sent successfully. I will get back to you soon.');
+    await page.waitForTimeout(400);
+    expect(posts).toHaveLength(0);
+  });
+
+  test('the trap field is hidden from people and assistive technology', async ({ page }) => {
+    await page.goto('/contact');
+    const hp = page.locator('.hp');
+    await expect(hp).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('#company-website')).toHaveAttribute('tabindex', '-1');
+    const box = await hp.boundingBox();
+    expect(box === null || box.x + box.width <= 0).toBe(true);
   });
 });

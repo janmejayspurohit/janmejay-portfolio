@@ -23,6 +23,11 @@
     <textarea id="message" name="message" rows="6" placeholder="Write your message here..." maxlength="1000" required></textarea>
     <p id="message-error" class="field-error" role="alert" hidden></p>
   </div>
+  <!-- Bot trap: real visitors never see or reach this field; form-filling bots fill it. -->
+  <div class="hp" aria-hidden="true">
+    <label for="company-website">Leave this field empty</label>
+    <input id="company-website" name="company_website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
   <div class="form-actions">
     <button type="submit" class="btn btn-primary" disabled>Send Message</button>
     <p class="form-status" aria-live="polite"></p>
@@ -46,6 +51,9 @@ const INITIAL_FORM: FormValues = {
 };
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_ENDPOINT || '';
+// A person needs a few seconds to type four fields; a script submits at once.
+const MIN_FILL_MS = 3000;
+const loadedAt = Date.now();
 const MIN_MESSAGE_LENGTH = 5;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -190,6 +198,21 @@ const initContactForm = () => {
       status = 'error';
       feedback = 'Contact endpoint is not configured yet. Please try again later.';
       updateStatusDisplay();
+      return;
+    }
+
+    // Bot traps. A filled hidden field, or a form completed faster than a person
+    // can type, is treated as a bot: show the usual success message and send nothing.
+    const trapField = document.getElementById('company-website') as HTMLInputElement | null;
+    const trapped = (trapField?.value ?? '').trim() !== '' || Date.now() - loadedAt < MIN_FILL_MS;
+    if (trapped) {
+      status = 'success';
+      feedback = 'Message sent successfully. I will get back to you soon.';
+      form = INITIAL_FORM;
+      emailTouched = false;
+      messageTouched = false;
+      updateStatusDisplay();
+      (document.getElementById('contact-form') as HTMLFormElement | null)?.reset();
       return;
     }
 
