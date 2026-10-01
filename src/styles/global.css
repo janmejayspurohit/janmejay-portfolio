@@ -5,15 +5,15 @@
 :root,
 :root[data-theme='dark'] {
   /* Krishna blue ground, gopichandana gold for titles and actions, bright white for content. */
-  --bg: #0a2463;
-  --surface: #0f2d75;
-  --surface-2: #143785;
-  --line: #25479b;
-  --line-strong: #3a5db8;
+  --bg: #040273;
+  --surface: #0c0a86;
+  --surface-2: #151399;
+  --line: #2b29ae;
+  --line-strong: #4a48c9;
   --fg: #ffffff;
   --fg-strong: #ffffff;
   --fg-soft: #f3f6ff;
-  --muted: #a9bce8;
+  --muted: #b3b9f2;
   --title: #f2c230;
   --blue: #9cc2ff;
   --cyan: #7dcfff;
@@ -23,12 +23,12 @@
   --red: #ff8fa3;
   --yellow: #f2c230;
   --accent: #f2c230;
-  --on-accent: #0a2463;
-  --chip-fg: #d6e4ff;
+  --on-accent: #040273;
+  --chip-fg: #dcdfff;
   --chip-bg: rgba(255, 255, 255, 0.09);
-  --glow-1: rgba(120, 170, 255, 0.20);
+  --glow-1: rgba(125, 130, 255, 0.24);
   --glow-2: rgba(242, 194, 48, 0.12);
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 12px 32px rgba(3, 12, 40, 0.45);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 12px 32px rgba(2, 1, 45, 0.5);
   color-scheme: dark;
 }
 
