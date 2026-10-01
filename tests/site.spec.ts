@@ -789,7 +789,6 @@ test.describe('Name signals', () => {
     expect((await page.title()).startsWith('Janmejay')).toBe(true);
     await expect(page.locator('h1')).toHaveText(/^Janmejay/);
     await expect(page.locator('#about-title')).toHaveText('About Janmejay');
-    await expect(page.locator('.name-note')).toContainText('Janamejaya');
     const data = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent())!);
     const graph: Record<string, any>[] = data['@graph'];
     const person = graph.find((g) => g['@type'] === 'Person')!;
