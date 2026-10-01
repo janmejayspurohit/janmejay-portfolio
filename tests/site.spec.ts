@@ -442,3 +442,70 @@ test.describe('Career path geometry', () => {
     });
   }
 });
+
+// User rules (2026-09-30) for the Experience roadmap: one continuous line with a stop per role,
+// the arrowhead centred on the line, dates directly under the title (not under the logo),
+// the logo spanning title + dates, and no card on hover.
+test.describe('Experience roadmap', () => {
+  test('stops, heading layout and arrow alignment', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/experience');
+    const m = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll<HTMLElement>('.rows > .row')];
+      const list = document.querySelector('.rows') as HTMLElement;
+      const dotY = parseFloat(getComputedStyle(list).getPropertyValue('--dot-y'));
+      const arrow = getComputedStyle(list, '::after');
+      return {
+        count: rows.length,
+        currentCount: rows.filter((r) => r.classList.contains('current')).length,
+        firstIsCurrent: rows[0].classList.contains('current'),
+        arrowCentre: parseFloat(arrow.left) + parseFloat(arrow.borderLeftWidth),
+        rows: rows.map((r) => {
+          const top = r.getBoundingClientRect().top;
+          const logo = r.querySelector('.row-logo')!.getBoundingClientRect();
+          const heading = r.querySelector('.row-heading')!.getBoundingClientRect();
+          const title = r.querySelector('.row-title')!.getBoundingClientRect();
+          const date = r.querySelector('.row-heading .row-date')!.getBoundingClientRect();
+          const line = getComputedStyle(r, '::before');
+          const stop = getComputedStyle(r, '::after');
+          return {
+            lineCentre: parseFloat(line.left) + parseFloat(line.width) / 2,
+            stopCentreX: parseFloat(stop.left) + parseFloat(stop.width) / 2,
+            stopVsLogo: Math.abs(top + dotY - (logo.top + logo.height / 2)),
+            dateBelowTitle: date.top >= title.bottom - 1,
+            dateAlignedWithTitle: Math.abs(date.left - title.left),
+            dateRightOfLogo: date.left >= logo.right,
+            logoVsHeading: Math.abs(logo.height - heading.height),
+            borderTop: parseFloat(getComputedStyle(r).borderTopWidth),
+          };
+        }),
+      };
+    });
+    expect(m.count).toBe(6);
+    expect(m.currentCount).toBe(1);
+    expect(m.firstIsCurrent).toBe(true);
+    for (const r of m.rows) {
+      expect(r.lineCentre).toBe(m.arrowCentre);        // arrowhead sits on the line
+      expect(r.stopCentreX).toBe(m.arrowCentre);       // so does every stop
+      expect(r.stopVsLogo).toBeLessThanOrEqual(1);     // stop level with the logo
+      expect(r.dateBelowTitle).toBe(true);
+      expect(r.dateAlignedWithTitle).toBeLessThanOrEqual(1);
+      expect(r.dateRightOfLogo).toBe(true);
+      expect(r.logoVsHeading).toBeLessThanOrEqual(2);  // logo spans title + dates
+      expect(r.borderTop).toBe(0);                     // a row border would break the line
+    }
+  });
+
+  test('hover marks the stop without drawing a card', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/experience');
+    const row = page.locator('.rows > .row').nth(1);
+    const before = await row.evaluate((el) => getComputedStyle(el).backgroundColor);
+    await row.locator('.row-title').hover();
+    await expect(row.locator('.row-date')).toHaveCSS('color', await page.evaluate(() => {
+      const probe = document.createElement('span'); probe.style.color = 'var(--accent)'; document.body.append(probe);
+      const c = getComputedStyle(probe).color; probe.remove(); return c;
+    }));
+    expect(await row.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(before);
+  });
+});
