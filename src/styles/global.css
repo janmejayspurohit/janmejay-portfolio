@@ -315,14 +315,20 @@ a.tile:hover .tile-link-arrow { color: var(--accent); }
     grid-template-areas: 'hero' 'now' 'edu' 'path' 'photo' 'lang' 'count' 'stack' 'cv';
   }
   .t-photo { min-height: 360px; }
-  /* Phones: the career path stays a horizontal roadmap; labels alternate
-     below and above the line so six stops fit without stacking or scrolling. */
-  .path { height: 110px; margin-top: 8px; }
-  .path::before { top: 50px; }
-  .path::after { top: 46px; }
-  .path li { padding-top: 64px; }
-  .path li:nth-child(even) { padding-top: 0; }
-  .path li::before { top: 45px; }
+  /* Phones: a snake roadmap. Stops 1-4 run left to right, the line turns down
+     at the right edge, and stops 5-6 run back right to left, ending in an arrow.
+     Row 1 dots sit at y=7, row 2 dots at y=87 (62px rows + 18px gap). */
+  .path { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 62px 62px; row-gap: 18px; margin-top: 8px; }
+  .path li:nth-child(5) { grid-column: 4; grid-row: 2; }
+  .path li:nth-child(6) { grid-column: 3; grid-row: 2; }
+  .path::before {
+    left: 8px; right: 0; top: 6px; height: 82px; width: auto; background: none;
+    border: 2px solid var(--line-strong); border-left: 0; border-radius: 0 18px 18px 0;
+  }
+  .path::after {
+    right: auto; left: 0; top: 82px;
+    border-left: 0; border-right: 9px solid var(--line-strong); border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+  }
   .path .yr, .path .org { white-space: nowrap; overflow: visible; text-overflow: clip; }
 }
 
