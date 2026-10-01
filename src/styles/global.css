@@ -5,11 +5,11 @@
 :root,
 :root[data-theme='dark'] {
   /* Krishna blue ground, gopichandana gold for titles and actions, bright white for content. */
-  --bg: #040273;
-  --surface: #0c0a86;
-  --surface-2: #151399;
-  --line: #2b29ae;
-  --line-strong: #4a48c9;
+  --bg: #020146;
+  --surface: #08075a;
+  --surface-2: #0f0d70;
+  --line: #22208e;
+  --line-strong: #403eb4;
   --fg: #ffffff;
   --fg-strong: #ffffff;
   --fg-soft: #f3f6ff;
@@ -23,7 +23,7 @@
   --red: #ff8fa3;
   --yellow: #f2c230;
   --accent: #f2c230;
-  --on-accent: #040273;
+  --on-accent: #020146;
   --chip-fg: #dcdfff;
   --chip-bg: rgba(255, 255, 255, 0.09);
   --glow-1: rgba(125, 130, 255, 0.24);
