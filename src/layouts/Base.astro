@@ -29,6 +29,10 @@ const graph: Record<string, unknown>[] = [
     '@type': 'Person',
     '@id': personId,
     name: site.name,
+    givenName: 'Janmejay',
+    additionalName: 'S',
+    familyName: 'Purohit',
+    alternateName: ['Janmejay', 'Janmejay Purohit'],
     url: site.url,
     image: new URL(site.portraitUrl, site.url).href,
     jobTitle: site.role,
@@ -43,7 +47,8 @@ const graph: Record<string, unknown>[] = [
     knowsAbout: ['TypeScript', 'JavaScript', 'Svelte', 'Astro', 'React', 'Angular', 'Node.js', 'Web performance', 'Web accessibility'],
     knowsLanguage: ['English', 'Kannada', 'Hindi', 'Japanese'],
   },
-  { '@type': 'WebSite', '@id': websiteId, url: site.url, name: site.name, inLanguage: 'en', publisher: { '@id': personId } },
+  // name + alternateName feed Google's site-name display for the home page
+  { '@type': 'WebSite', '@id': websiteId, url: site.url, name: site.name, alternateName: ['Janmejay', 'janmejay.info'], inLanguage: 'en', publisher: { '@id': personId } },
   {
     '@type': isHome ? 'ProfilePage' : 'WebPage',
     '@id': `${canonical}#webpage`,
@@ -93,6 +98,8 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
     <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png" />
     <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="me" href={site.linkedin} />
+    <link rel="me" href={site.github} />
     <meta property="og:type" content={isHome ? 'profile' : 'website'} />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
@@ -103,6 +110,8 @@ const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
     <meta property="og:image:alt" content={`${site.name}, ${site.role}`} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content="en_US" />
+    {isHome && <meta property="profile:first_name" content="Janmejay" />}
+    {isHome && <meta property="profile:last_name" content="Purohit" />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

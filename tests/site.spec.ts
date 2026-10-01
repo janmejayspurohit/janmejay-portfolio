@@ -781,3 +781,23 @@ test.describe('SEO', () => {
     }
   });
 });
+
+// The site should be an unambiguous match for a search on the first name alone.
+test.describe('Name signals', () => {
+  test('home page ties the name "Janmejay" to this person and site', async ({ page }) => {
+    await page.goto('/');
+    expect((await page.title()).startsWith('Janmejay')).toBe(true);
+    await expect(page.locator('h1')).toHaveText(/^Janmejay/);
+    const data = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent())!);
+    const graph: Record<string, any>[] = data['@graph'];
+    const person = graph.find((g) => g['@type'] === 'Person')!;
+    const website = graph.find((g) => g['@type'] === 'WebSite')!;
+    expect(person.givenName).toBe('Janmejay');
+    expect(person.familyName).toBe('Purohit');
+    expect(person.alternateName).toContain('Janmejay');
+    expect(website.alternateName).toContain('Janmejay');
+    expect(website.url).toBe('https://janmejay.info');
+    await expect(page.locator('meta[property="profile:first_name"]')).toHaveAttribute('content', 'Janmejay');
+    await expect(page.locator('link[rel="me"]')).toHaveCount(2);
+  });
+});
