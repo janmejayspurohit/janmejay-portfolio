@@ -1,4 +1,35 @@
 ---
+---
+
+<p class="form-note">Use this form to send me a message. Your submission is delivered to my Discord inbox.</p>
+<form class="form" id="contact-form" novalidate>
+  <div class="form-row">
+    <div class="field">
+      <label for="name">Name <span class="req" aria-hidden="true">*</span></label>
+      <input id="name" name="name" type="text" placeholder="Your full name" maxlength="120" required />
+    </div>
+    <div class="field">
+      <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+      <input id="email" name="email" type="email" placeholder="you@example.com" maxlength="254" required />
+      <p id="email-error" class="field-error" role="alert" hidden></p>
+    </div>
+  </div>
+  <div class="field">
+    <label for="subject">Subject <span class="req" aria-hidden="true">*</span></label>
+    <input id="subject" name="subject" type="text" placeholder="What is this about?" maxlength="300" required />
+  </div>
+  <div class="field">
+    <label for="message">Message <span class="req" aria-hidden="true">*</span></label>
+    <textarea id="message" name="message" rows="6" placeholder="Write your message here..." maxlength="1000" required></textarea>
+    <p id="message-error" class="field-error" role="alert" hidden></p>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary" disabled>Send Message</button>
+    <p class="form-status" aria-live="polite"></p>
+  </div>
+</form>
+
+<script>
 // Plain JavaScript version for Astro compatibility
 type FormValues = {
   name: string;
@@ -302,32 +333,4 @@ const initContactForm = () => {
 
 // Execute the initialization function
 initContactForm();
----
-
-<p class="form-note">Use this form to send me a message. Your submission is delivered to my Discord inbox.</p>
-<form class="form" id="contact-form" novalidate>
-  <div class="form-row">
-    <div class="field">
-      <label for="name">Name <span class="req" aria-hidden="true">*</span></label>
-      <input id="name" name="name" type="text" placeholder="Your full name" maxlength="120" required />
-    </div>
-    <div class="field">
-      <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
-      <input id="email" name="email" type="email" placeholder="you@example.com" maxlength="254" required />
-      <p id="email-error" class="field-error" role="alert" hidden></p>
-    </div>
-  </div>
-  <div class="field">
-    <label for="subject">Subject <span class="req" aria-hidden="true">*</span></label>
-    <input id="subject" name="subject" type="text" placeholder="What is this about?" maxlength="300" required />
-  </div>
-  <div class="field">
-    <label for="message">Message <span class="req" aria-hidden="true">*</span></label>
-    <textarea id="message" name="message" rows="6" placeholder="Write your message here..." maxlength="1000" required></textarea>
-    <p id="message-error" class="field-error" role="alert" hidden></p>
-  </div>
-  <div class="form-actions">
-    <button type="submit" class="btn btn-primary" disabled>Send Message</button>
-    <p class="form-status" aria-live="polite"></p>
-  </div>
-</form>
+</script>
