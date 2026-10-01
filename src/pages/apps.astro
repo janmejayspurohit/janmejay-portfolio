@@ -1,0 +1,26 @@
+---
+import Split from '../layouts/Split.astro';
+import Icon from '../components/Icon.astro';
+import { apps } from '../data/apps';
+---
+<Split
+  title="Janmejay S Purohit - Apps"
+  description="Apps dashboard featuring Uptime Kuma, Grafana, Drive, and PDF Editor."
+  eyebrow="~/apps"
+  heading="Apps"
+  intro="Tools I host and use: monitoring, dashboards, file storage and PDF utilities."
+>
+  <div class="cards">
+    {apps.map((a) => (
+      <a class="card reveal" href={a.url} target="_blank" rel="noopener noreferrer">
+        <span class="tile-link-arrow"><Icon name="lucide:arrow-up-right" /></span>
+        <h2 style="font-size:1.05rem">{a.name}</h2>
+        <span class="host">{new URL(a.url).host}</span>
+        <p>{a.desc}</p>
+        <ul class="chips">
+          {a.tags.map((t) => <li class="chip muted">{t}</li>)}
+        </ul>
+      </a>
+    ))}
+  </div>
+</Split>

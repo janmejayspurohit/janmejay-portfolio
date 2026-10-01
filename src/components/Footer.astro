@@ -1,0 +1,61 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+<footer class="site-footer" id="contact-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h2>Get in touch</h2>
+        <p>Questions, suggestions or opportunities: email me or use the <a href="/contact">contact form</a>.</p>
+      </div>
+      <div class="footer-item">
+        <span class="label"><Icon name="mdi:linkedin" />LinkedIn</span>
+        <a href={site.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">{site.name}</a>
+      </div>
+      <div class="footer-item">
+        <span class="label"><Icon name="lucide:mail" />E-mail</span>
+        <a href={`mailto:${site.email}?subject=Inquiry`} aria-label="Send email">{site.email}</a>
+      </div>
+      <div class="footer-item">
+        <span class="label"><Icon name="lucide:phone" />Phone</span>
+        <span class="v">{site.phone}</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; {year} <a href="/">{site.name}</a>. All Rights Reserved.</span>
+      <span data-visitors hidden>Visitors: <strong data-visitor-count>—</strong></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Same contract as the previous site: one hit per page view, then read the total.
+  const base = (import.meta.env.VITE_CONTACT_ENDPOINT || '').replace(/\/$/, '');
+  const wrap = document.querySelector<HTMLElement>('[data-visitors]');
+  const counts = document.querySelectorAll<HTMLElement>('[data-visitor-count]');
+
+  async function run() {
+    try {
+      await fetch(`${base}/api/visitors/hit`, { method: 'POST' });
+      const res = await fetch(`${base}/api/visitors`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error ?? 'Unknown error');
+      const text = Number(data.count).toLocaleString('en-US');
+      counts.forEach((el) => (el.textContent = text));
+      if (wrap) wrap.hidden = false;
+    } catch (e) {
+      console.error('Visitor counter:', e);
+      counts.forEach((el) => (el.textContent = 'n/a'));
+      if (wrap) {
+        wrap.textContent = 'visitor count unavailable';
+        wrap.style.opacity = '0.6';
+        wrap.hidden = false;
+      }
+    }
+  }
+  run();
+</script>

@@ -1,0 +1,22 @@
+---
+import Split from '../layouts/Split.astro';
+import Icon from '../components/Icon.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { site } from '../data/site';
+---
+<Split
+  title="Janmejay S Purohit - Contact"
+  description="Get in touch with Janmejay S Purohit through the contact form or direct channels."
+  eyebrow="~/contact"
+  heading="Contact"
+  intro="Questions, suggestions or opportunities. Send a message and I’ll get back to you."
+>
+  <ul class="direct" slot="aside">
+    <li><Icon name="lucide:mail" /><a href={`mailto:${site.email}?subject=Inquiry`}>{site.email}</a></li>
+    <li><Icon name="mdi:linkedin" /><a href={site.linkedin} target="_blank" rel="noopener noreferrer">linkedin.com/in/jsp324</a></li>
+    <li><Icon name="mdi:github" /><a href={site.github} target="_blank" rel="noopener noreferrer">github.com/janmejayspurohit</a></li>
+    <li><Icon name="lucide:phone" /><span>{site.phone}</span></li>
+  </ul>
+
+  <ContactForm />
+</Split>

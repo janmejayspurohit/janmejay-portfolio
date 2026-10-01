@@ -1,0 +1,60 @@
+---
+import Split from '../layouts/Split.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { education, certifications, skillGroups } from '../data/resume';
+---
+<Split
+  title="Janmejay S Purohit - Resume & Skills"
+  description="Resume, technical skills, and educational qualifications of Janmejay S Purohit."
+  eyebrow="~/resume"
+  heading="Resume"
+  intro="Full stack software engineer. The one-page PDF is below, with skills and education on this page."
+>
+  <div class="actions" slot="aside">
+    <a class="btn btn-primary" href={site.resume} target="_blank" rel="noopener">View PDF <Icon name="lucide:file-text" size={16} /></a>
+    <a class="btn btn-ghost" href={site.resume} download="resume-janmejay-v5.pdf">Download <Icon name="lucide:download" size={16} /></a>
+  </div>
+
+  <section aria-labelledby="skills-title" class="reveal">
+    <h2 class="block-title" id="skills-title">Skills</h2>
+    <div class="skill-groups">
+      {skillGroups.map((g) => (
+        <div class="skill-group">
+          <h3>{g.title}</h3>
+          <ul class="chips">
+            {g.items.map((s) => <li class="chip muted">{s}</li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section aria-labelledby="edu-title" class="reveal">
+    <h2 class="block-title" id="edu-title">Qualification</h2>
+    <ul class="edu">
+      {education.map((s) => (
+        <li>
+          <span class="row-date">{s.years}</span>
+          <div>
+            <h3>{s.name}</h3>
+            <p class="what">{s.what}</p>
+            {s.extra && <p class="extra">{s.extra}</p>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section aria-labelledby="cert-title" class="reveal">
+    <h2 class="block-title" id="cert-title">Certifications</h2>
+    <ul class="edu">
+      {certifications.map((c) => (
+        <li>
+          <span class="row-date">{c.year}</span>
+          <div><h3>{c.name}</h3></div>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Split>

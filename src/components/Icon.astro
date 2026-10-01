@@ -1,0 +1,32 @@
+---
+// Build-time inline SVG icons: nothing ships to the browser but the <svg>.
+import { getIconData, iconToSVG, iconToHTML, replaceIDs } from '@iconify/utils';
+import { icons as lucide } from '@iconify-json/lucide';
+import { icons as mdi } from '@iconify-json/mdi';
+
+interface Props {
+  name: `${'lucide' | 'mdi'}:${string}`;
+  size?: number;
+  label?: string;
+  class?: string;
+}
+
+const { name, size = 18, label, class: className = '' } = Astro.props;
+const [prefix, iconName] = name.split(':');
+const data = getIconData(prefix === 'mdi' ? mdi : lucide, iconName);
+if (!data) throw new Error(`Unknown icon: ${name}`);
+
+const { attributes, body } = iconToSVG(data, { height: size });
+const a11y: Record<string, string> = label
+  ? { role: 'img', 'aria-label': label }
+  : { 'aria-hidden': 'true' };
+const svg = iconToHTML(replaceIDs(body), {
+  ...attributes,
+  width: String(size),
+  height: String(size),
+  class: className,
+  focusable: 'false',
+  ...a11y,
+});
+---
+<Fragment set:html={svg} />

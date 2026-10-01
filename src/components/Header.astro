@@ -1,0 +1,97 @@
+---
+import Icon from './Icon.astro';
+import { nav, site } from '../data/site';
+
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) =>
+  href === '/' ? current === '/' : current === href || current.startsWith(`${href}/`);
+---
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label={`Home - ${site.name}`}>
+      <span class="brand-mark">JSP</span>
+      <span class="brand-name">{site.name}</span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      {nav.map((item) => (
+        <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" data-translate aria-expanded="false" aria-controls="translate-slot" title="Translate this page">
+        <Icon name="lucide:languages" />
+        <span class="translate-label">Translate</span>
+      </button>
+      <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch theme">
+        <span class="icon-moon"><Icon name="lucide:moon" /></span>
+        <span class="icon-sun"><Icon name="lucide:sun" /></span>
+      </button>
+      <details class="menu">
+        <summary class="icon-btn" aria-label="Menu"><Icon name="lucide:menu" /></summary>
+        <nav class="menu-panel" aria-label="Mobile">
+          {nav.map((item) => (
+            <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+          ))}
+        </nav>
+      </details>
+    </div>
+  </div>
+  <div id="translate-slot" class="translate-slot" aria-label="Translate this page">
+    <div id="google_translate_element"></div>
+  </div>
+</header>
+
+<script>
+  const root = document.documentElement;
+
+  const toggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const syncLabel = () =>
+    toggle?.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  syncLabel();
+  toggle?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      /* private mode: the choice lasts for this page only */
+    }
+    syncLabel();
+  });
+
+  // Google Translate loads only when someone asks for it.
+  const translateBtn = document.querySelector<HTMLButtonElement>('[data-translate]');
+  const slot = document.getElementById('translate-slot');
+  const w = window as unknown as {
+    googleTranslateElementInit?: () => void;
+    google?: { translate?: { TranslateElement?: any } };
+  };
+  translateBtn?.addEventListener('click', () => {
+    if (!slot) return;
+    const open = !slot.classList.contains('is-open');
+    slot.classList.toggle('is-open', open);
+    translateBtn.setAttribute('aria-expanded', String(open));
+    if (!open) return;
+    w.googleTranslateElementInit = () => {
+      const TE = w.google?.translate?.TranslateElement;
+      const host = document.getElementById('google_translate_element');
+      if (!TE || !host || host.childElementCount > 0) return;
+      new TE({ pageLanguage: 'en', autoDisplay: false, layout: TE.InlineLayout.HORIZONTAL }, 'google_translate_element');
+    };
+    if (!document.getElementById('google-translate-script')) {
+      const s = document.createElement('script');
+      s.id = 'google-translate-script';
+      s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      s.async = true;
+      document.body.appendChild(s);
+    } else {
+      w.googleTranslateElementInit();
+    }
+  });
+
+  // Close the phone menu when tapping outside it.
+  const menu = document.querySelector<HTMLDetailsElement>('.menu');
+  document.addEventListener('click', (e) => {
+    if (menu?.open && !menu.contains(e.target as Node)) menu.open = false;
+  });
+</script>

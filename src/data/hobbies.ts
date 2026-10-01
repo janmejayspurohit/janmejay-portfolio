@@ -1,4 +1,4 @@
-export interface Hobby { icon: string; label: string }
+export interface Hobby { icon: `lucide:${string}`; label: string }
 export const hobbies: Hobby[] = [
   { icon: 'lucide:gamepad-2',    label: 'Gaming' },
   { icon: 'lucide:dumbbell',  label: 'Gym' },

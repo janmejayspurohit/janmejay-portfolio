@@ -1,0 +1,80 @@
+---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BackToTop from '../components/BackToTop.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const canonical = new URL(path, site.url).href;
+const ogImage = new URL(site.ogImage, site.url).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: site.url,
+  image: new URL(site.portraitUrl, site.url).href,
+  sameAs: [site.linkedin, site.github],
+  jobTitle: site.role,
+  email: site.email,
+  alumniOf: [
+    { '@type': 'CollegeOrUniversity', name: 'Indiana University Bloomington' },
+    { '@type': 'CollegeOrUniversity', name: 'Dayananda Sagar University' },
+  ],
+  knowsLanguage: ['English', 'Kannada', 'Hindi', 'Japanese'],
+};
+---
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          document.documentElement.setAttribute('data-theme', t === 'light' || t === 'dark' ? t : 'dark');
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content="Janmejay Purohit, Full Stack Developer, Software Engineer, Svelte, Astro, Angular, ReactJS, Node.js, Ruby on Rails, Python, Portfolio" />
+    <meta name="author" content={site.name} />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#16161e" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/j.png" type="image/png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content={site.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <BackToTop />
+  </body>
+</html>

@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found - Janmejay S Purohit" description="This page does not exist.">
+  <div class="wrap lost">
+    <span class="label"><span class="prompt">›</span> 404</span>
+    <h1>This page doesn’t exist.</h1>
+<pre><span class="prompt">$</span> cd <span data-missing>/this-page</span>
+cd: no such file or directory
+<span class="prompt">$</span> cd ~</pre>
+    <a class="btn btn-primary" href="/">Take me home</a>
+  </div>
+</Base>
+
+<script>
+  const el = document.querySelector('[data-missing]');
+  if (el) el.textContent = window.location.pathname;
+</script>

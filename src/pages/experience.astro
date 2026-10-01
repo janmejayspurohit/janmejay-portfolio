@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import Split from '../layouts/Split.astro';
+import Icon from '../components/Icon.astro';
+import { experience } from '../data/experience';
+import { site } from '../data/site';
+---
+<Split
+  title="Janmejay S Purohit - Experience"
+  description="Experience timeline of Janmejay S Purohit across software engineering roles and graduate studies."
+  eyebrow="~/experience"
+  heading="Experience"
+  intro="From web internships in Bangalore to leading development at T-Mobile: payments, enterprise platforms and self-service telecom."
+>
+  <div class="actions" slot="aside">
+    <a class="btn btn-primary" href={site.resume} target="_blank" rel="noopener">Resume PDF <Icon name="lucide:file-text" size={16} /></a>
+    <a class="btn btn-ghost" href={site.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <Icon name="lucide:arrow-up-right" size={16} /></a>
+  </div>
+
+  <ol class="rows">
+    {experience.map((e) => (
+      <li class="row reveal">
+        <div class="row-date">{e.period}</div>
+        <div>
+          <div class="row-head">
+            <Image class="row-logo" src={e.logo} alt="" width={28} height={28} />
+            <h2 class="row-title">
+              {e.role}<span class="sep">·</span><a href={e.url} target="_blank" rel="noopener noreferrer">{e.company} ↗</a>
+            </h2>
+          </div>
+          {e.via && <div class="row-sub">{e.via}</div>}
+          <p class="row-summary">{e.summary}</p>
+          {e.points.length > 0 && (
+            <ul class="row-points">
+              {e.points.map((p) => <li>{p}</li>)}
+            </ul>
+          )}
+          <ul class="chips">
+            {e.tech.map((t) => <li class="chip">{t}</li>)}
+          </ul>
+        </div>
+      </li>
+    ))}
+  </ol>
+</Split>
