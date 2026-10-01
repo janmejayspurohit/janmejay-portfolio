@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { join } from 'node:path';
 
 const routes = [
   '/',
@@ -56,7 +55,7 @@ test.describe('Portfolio Routes', () => {
       
       // Check title
       const title = await page.title();
-      expect(title).toBe(expectedTitles[route]);
+      expect(title).toBe(expectedTitles[route as keyof typeof expectedTitles]);
       
       // Check canonical link
       const canonical = await page.locator('link[rel="canonical"]').first();
@@ -201,16 +200,15 @@ test.describe('Portfolio Routes', () => {
     await page.goto('/');
     
     // Check default theme is dark
-    let htmlElement = await page.$('html');
-    expect(await htmlElement.getAttribute('data-theme')).toBe('dark');
+    const html = page.locator('html');
+    await expect(html).toHaveAttribute('data-theme', 'dark');
     
     // Click the theme toggle button
     const themeToggle = await page.locator('[data-theme-toggle]');
     await themeToggle.click();
     
     // Check theme is now light
-    htmlElement = await page.$('html');  // Get fresh element handle
-    expect(await htmlElement.getAttribute('data-theme')).toBe('light');
+    await expect(html).toHaveAttribute('data-theme', 'light');
     
     // Check localStorage
     const localStorageTheme = await page.evaluate(() => localStorage.getItem('theme'));
@@ -218,20 +216,17 @@ test.describe('Portfolio Routes', () => {
     
     // Reload the page and check theme is still light
     await page.reload();
-    htmlElement = await page.$('html');  // Get fresh element handle after reload
-    expect(await htmlElement.getAttribute('data-theme')).toBe('light');
+    await expect(html).toHaveAttribute('data-theme', 'light');
   });
 
   test('Visitor counter shows correct values', async ({ page }) => {
     await page.goto('/');
     
     // Check footer shows correct visitor count
-    const footerText = await page.locator('footer').textContent();
-    expect(footerText).toContain('Visitors: 1,234');
+    await expect(page.locator('footer [data-visitors]')).toHaveText('Visitors: 1,234');
     
     // Check bento tile element shows correct count
-    const visitorCountElement = await page.locator('.t-count [data-visitor-count]');
-    expect(await visitorCountElement.textContent()).toBe('1,234');
+    await expect(page.locator('.t-count [data-visitor-count]')).toHaveText('1,234');
   });
 
   test('Contact form validation works', async ({ page }) => {
