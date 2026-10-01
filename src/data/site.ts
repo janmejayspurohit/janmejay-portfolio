@@ -3,7 +3,6 @@ export const site = {
   url: 'https://www.janmejay.info',
   role: 'Full Stack Software Engineer',
   email: 'janmejayspurohit@gmail.com',
-  phone: '+1 (929)-593-8209',
   github: 'https://github.com/janmejayspurohit',
   linkedin: 'https://www.linkedin.com/in/jsp324/',
   resume: '/files/resume-janmejay-v5.pdf',

@@ -78,7 +78,14 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Full-height column so the footer sits at the bottom on short pages. */
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
+
+main { flex: 1 0 auto; }
 
 img { max-width: 100%; height: auto; display: block; }
 
@@ -215,7 +222,7 @@ ul { margin: 0; }
   grid-template-areas:
     'hero hero photo now'
     'hero hero photo edu'
-    'ship ship path path'
+    'path path path path'
     'lang count stack cv';
 }
 .tile {
@@ -262,26 +269,20 @@ a.tile:hover .tile-link-arrow { color: var(--accent); }
 
 .t-now { grid-area: now; }
 .t-edu { grid-area: edu; }
-.t-ship { grid-area: ship; }
 .t-path { grid-area: path; }
 .t-lang { grid-area: lang; }
 .t-count { grid-area: count; }
 .t-stack { grid-area: stack; }
 .t-cv { grid-area: cv; }
 
-.t-ship .label { color: var(--orange); }
-.metric { display: flex; align-items: baseline; gap: 10px; font-family: var(--font-mono); color: var(--fg-strong); }
-.metric .from { color: var(--muted); font-size: 1.1rem; text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--red) 70%, transparent); }
-.metric .to { font-size: 1.9rem; font-weight: 700; color: var(--green); letter-spacing: -0.02em; }
-.bars { display: grid; gap: 6px; margin-top: 4px; }
-.bar { display: grid; grid-template-columns: 58px minmax(0, 1fr) 48px; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
-.bar-track { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 99px; background: var(--line-strong); }
-.bar.after .bar-fill { background: var(--green); }
-.bar span:last-child { text-align: right; color: var(--fg-soft); }
 
 .path { list-style: none; padding: 0; margin: 6px 0 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); position: relative; }
-.path::before { content: ''; position: absolute; left: 6px; right: 6px; top: 6px; height: 2px; background: var(--line-strong); }
+.path::before { content: ''; position: absolute; left: 6px; right: 8px; top: 6px; height: 2px; background: var(--line-strong); }
+/* Arrowhead at the end of the line: the path continues. */
+.path::after {
+  content: ''; position: absolute; right: 0; top: 2px; width: 0; height: 0;
+  border-left: 9px solid var(--line-strong); border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+}
 .path li { position: relative; padding-top: 22px; min-width: 0; }
 .path li::before {
   content: ''; position: absolute; top: 1px; left: 0; width: 12px; height: 12px; border-radius: 50%;
@@ -302,7 +303,6 @@ a.tile:hover .tile-link-arrow { color: var(--accent); }
       'hero hero'
       'photo now'
       'photo edu'
-      'ship ship'
       'path path'
       'lang count'
       'stack cv';
@@ -312,11 +312,18 @@ a.tile:hover .tile-link-arrow { color: var(--accent); }
 @media (max-width: 560px) {
   .bento {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'hero' 'now' 'edu' 'ship' 'path' 'photo' 'lang' 'count' 'stack' 'cv';
+    grid-template-areas: 'hero' 'now' 'edu' 'path' 'photo' 'lang' 'count' 'stack' 'cv';
   }
   .t-photo { min-height: 360px; }
-  .path { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; }
-  .path::before { display: none; }
+  /* Phones: the career path stays a horizontal roadmap; labels alternate
+     below and above the line so six stops fit without stacking or scrolling. */
+  .path { height: 110px; margin-top: 8px; }
+  .path::before { top: 50px; }
+  .path::after { top: 46px; }
+  .path li { padding-top: 64px; }
+  .path li:nth-child(even) { padding-top: 0; }
+  .path li::before { top: 45px; }
+  .path .yr, .path .org { white-space: nowrap; overflow: visible; text-overflow: clip; }
 }
 
 /* ---------- sections (home, below the bento) ---------- */
