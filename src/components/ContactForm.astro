@@ -1,6 +1,13 @@
 ---
 // Plain JavaScript version for Astro compatibility
-const INITIAL_FORM = {
+type FormValues = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+};
+
+const INITIAL_FORM: FormValues = {
   name: '',
   email: '',
   subject: '',
@@ -11,14 +18,23 @@ const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_ENDPOINT || '';
 const MIN_MESSAGE_LENGTH = 5;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-function clamp(text, max) {
+/** 
+ * @param {string | null | undefined} text 
+ * @param {number} max 
+ * @returns {string}
+ */
+function clamp(text: string | null | undefined, max: number): string {
   if (!text) return '';
   const trimmed = text.trim();
   if (trimmed.length <= max) return trimmed;
   return `${trimmed.slice(0, max)}...`;
 }
 
-function buildDiscordPayload({ name, email, subject, message }) {
+/** 
+ * @param {FormValues} formValues 
+ * @returns {Object}
+ */
+function buildDiscordPayload({ name, email, subject, message }: FormValues) {
   return {
     username: 'Portfolio Bot',
     allowed_mentions: { parse: [] },
@@ -44,12 +60,12 @@ function buildDiscordPayload({ name, email, subject, message }) {
 // This will be executed on the client side
 const initContactForm = () => {
   let form = INITIAL_FORM;
-  let status = 'idle';
+  let status: 'idle' | 'loading' | 'success' | 'error' = 'idle';
   let feedback = '';
   let emailTouched = false;
   let messageTouched = false;
   
-  const updateForm = (name, value) => {
+  const updateForm = (name: string, value: string) => {
     form = { ...form, [name]: value };
     updateSubmitButton();
   };
@@ -65,7 +81,7 @@ const initContactForm = () => {
   };
 
   const updateSubmitButton = () => {
-    const formElement = document.getElementById('contact-form');
+    const formElement = document.getElementById('contact-form') as HTMLFormElement | null;
     if (!formElement) return;
     
     const isEmailInvalid = !validateEmail();
@@ -79,14 +95,14 @@ const initContactForm = () => {
       isEmailInvalid ||
       isMessageTooShort;
 
-    const submitButton = formElement.querySelector('button[type="submit"]');
+    const submitButton = formElement.querySelector('button[type="submit"]') as HTMLButtonElement | null;
     if (submitButton) {
       submitButton.disabled = isSubmitDisabled;
     }
   };
 
-  const handleInputChange = (event) => {
-    const target = event.target;
+  const handleInputChange = (event: Event) => {
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
     updateForm(target.name, target.value);
     
     // Handle touched states for email and message
@@ -98,8 +114,8 @@ const initContactForm = () => {
     }
   };
 
-  const handleBlur = (event) => {
-    const target = event.target;
+  const handleBlur = (event: Event) => {
+    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
     if (target.name === 'email') {
       emailTouched = true;
     }
@@ -109,7 +125,7 @@ const initContactForm = () => {
     updateSubmitButton();
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: Event) => {
     event.preventDefault();
     
     // Mark fields as touched
@@ -180,7 +196,7 @@ const initContactForm = () => {
       updateStatusDisplay();
       
       // Reset form
-      const formElement = document.getElementById('contact-form');
+      const formElement = document.getElementById('contact-form') as HTMLFormElement | null;
       if (formElement) {
         formElement.reset();
       }
@@ -193,11 +209,11 @@ const initContactForm = () => {
   };
 
   const updateStatusDisplay = () => {
-    const formElement = document.getElementById('contact-form');
+    const formElement = document.getElementById('contact-form') as HTMLFormElement | null;
     if (!formElement) return;
     
-    const statusElement = formElement.querySelector('.form-status');
-    const submitButton = formElement.querySelector('button[type="submit"]');
+    const statusElement = formElement.querySelector('.form-status') as HTMLElement | null;
+    const submitButton = formElement.querySelector('button[type="submit"]') as HTMLButtonElement | null;
     
     if (statusElement) {
       statusElement.textContent = feedback;
@@ -209,21 +225,21 @@ const initContactForm = () => {
     }
     
     // Update error messages
-    const emailErrorElement = document.getElementById('email-error');
-    const messageErrorElement = document.getElementById('message-error');
+    const emailErrorElement = document.getElementById('email-error') as HTMLElement | null;
+    const messageErrorElement = document.getElementById('message-error') as HTMLElement | null;
     
     if (emailErrorElement) {
       if (emailTouched && !validateEmail()) {
         emailErrorElement.textContent = 'Please enter a valid email address.';
         emailErrorElement.hidden = false;
-        const emailInput = document.getElementById('email');
+        const emailInput = document.getElementById('email') as HTMLInputElement | null;
         if (emailInput) {
           emailInput.setAttribute('aria-invalid', 'true');
           emailInput.setAttribute('aria-describedby', 'email-error');
         }
       } else {
         emailErrorElement.hidden = true;
-        const emailInput = document.getElementById('email');
+        const emailInput = document.getElementById('email') as HTMLInputElement | null;
         if (emailInput) {
           emailInput.removeAttribute('aria-invalid');
           emailInput.removeAttribute('aria-describedby');
@@ -235,14 +251,14 @@ const initContactForm = () => {
       if (messageTouched && !validateMessage()) {
         messageErrorElement.textContent = `Please enter at least ${MIN_MESSAGE_LENGTH} characters in your message.`;
         messageErrorElement.hidden = false;
-        const messageInput = document.getElementById('message');
+        const messageInput = document.getElementById('message') as HTMLTextAreaElement | null;
         if (messageInput) {
           messageInput.setAttribute('aria-invalid', 'true');
           messageInput.setAttribute('aria-describedby', 'message-error');
         }
       } else {
         messageErrorElement.hidden = true;
-        const messageInput = document.getElementById('message');
+        const messageInput = document.getElementById('message') as HTMLTextAreaElement | null;
         if (messageInput) {
           messageInput.removeAttribute('aria-invalid');
           messageInput.removeAttribute('aria-describedby');
@@ -254,7 +270,7 @@ const initContactForm = () => {
   // Initialize form when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      const formElement = document.getElementById('contact-form');
+      const formElement = document.getElementById('contact-form') as HTMLFormElement | null;
       if (formElement) {
         formElement.addEventListener('submit', handleSubmit);
         
@@ -269,7 +285,7 @@ const initContactForm = () => {
     });
   } else {
     // DOM already loaded
-    const formElement = document.getElementById('contact-form');
+    const formElement = document.getElementById('contact-form') as HTMLFormElement | null;
     if (formElement) {
       formElement.addEventListener('submit', handleSubmit);
       
