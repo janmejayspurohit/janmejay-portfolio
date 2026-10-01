@@ -239,18 +239,18 @@ test.describe('Portfolio Routes', () => {
     
     // Check submit button is disabled when form is empty
     const submitButton = await page.locator('button[type="submit"]');
-    expect(await submitButton.isDisabled()).toBe(true);
+    await expect(submitButton).toBeDisabled();
     
     // Fill email with invalid value and blur - wait for validation to complete
     const emailInput = await page.locator('#email');
     await emailInput.fill('not-an-email');
     await page.waitForTimeout(100);  // Wait for validation to run
     
-    // Check error message is shown
+    // Check error message is shown using web-first assertions
     const emailError = await page.locator('#email-error');
-    expect(await emailError.isVisible()).toBe(true);
-    expect(await emailError.textContent()).toBe('Please enter a valid email address.');
-    expect(await emailInput.getAttribute('aria-invalid')).toBe('true');
+    await expect(emailError).toBeVisible();
+    await expect(emailError).toHaveText('Please enter a valid email address.');
+    await expect(emailInput).toHaveAttribute('aria-invalid', 'true');
     
     // Fill valid values in all fields to enable submit
     await page.locator('#name').fill('Test User');
@@ -259,7 +259,7 @@ test.describe('Portfolio Routes', () => {
     await page.locator('#message').fill('This is a test message.');
     
     // Check submit button is now enabled
-    expect(await submitButton.isDisabled()).toBe(false);
+    await expect(submitButton).toBeEnabled();
   });
 
   test('Contact form success handling works', async ({ page }) => {
@@ -285,15 +285,15 @@ test.describe('Portfolio Routes', () => {
     // Submit the form
     await page.locator('button[type="submit"]').click();
     
-    // Check success message is shown
+    // Check success message is shown using web-first assertions
     const successMessage = await page.locator('text=Message sent successfully. I will get back to you soon.');
-    expect(await successMessage.isVisible()).toBe(true);
+    await expect(successMessage).toBeVisible();
     
-    // Check fields are cleared
-    expect(await page.locator('#name').inputValue()).toBe('');
-    expect(await page.locator('#email').inputValue()).toBe('');
-    expect(await page.locator('#subject').inputValue()).toBe('');
-    expect(await page.locator('#message').inputValue()).toBe('');
+    // Check fields are cleared using web-first assertions
+    await expect(page.locator('#name')).toHaveValue('');
+    await expect(page.locator('#email')).toHaveValue('');
+    await expect(page.locator('#subject')).toHaveValue('');
+    await expect(page.locator('#message')).toHaveValue('');
   });
 
   test('Contact form error handling works', async ({ page }) => {
@@ -320,13 +320,27 @@ test.describe('Portfolio Routes', () => {
     // Submit the form
     await page.locator('button[type="submit"]').click();
     
-    // Check error message is shown - need to wait for the error to appear
+    // Check error message is shown using web-first assertions
     const errorMessage = await page.locator('text=boom');
-    expect(await errorMessage.isVisible()).toBe(true);
+    await expect(errorMessage).toBeVisible();
     
     // Check that there's an element with class 'error'
     const errorElement = await page.locator('.form-status.error');
-    expect(await errorElement.count()).toBeGreaterThan(0);
+    await expect(errorElement).toHaveCount(1);
+  });
+
+  test('Contact form shows no error for empty email field on blur', async ({ page }) => {
+    await page.goto('/contact');
+    
+    // Focus email field, leave it empty, then blur
+    const emailInput = await page.locator('#email');
+    await emailInput.focus();
+    await emailInput.blur();
+    
+    // Check that email error stays hidden and no aria-invalid attribute is set
+    const emailError = await page.locator('#email-error');
+    await expect(emailError).toBeHidden();
+    await expect(emailInput).not.toHaveAttribute('aria-invalid', 'true');
   });
 
   test('Translate on demand works', async ({ page }) => {

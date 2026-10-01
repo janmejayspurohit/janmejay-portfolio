@@ -143,6 +143,9 @@ const initContactForm = () => {
     if (target.name === 'message' && !messageTouched) {
       messageTouched = true;
     }
+    
+    // Update status display to show/hide field errors on input
+    updateStatusDisplay();
   };
 
   const handleBlur = (event: Event) => {
@@ -154,6 +157,9 @@ const initContactForm = () => {
       messageTouched = true;
     }
     updateSubmitButton();
+    
+    // Update status display to show/hide field errors on blur
+    updateStatusDisplay();
   };
 
   const handleSubmit = async (event: Event) => {
@@ -260,7 +266,9 @@ const initContactForm = () => {
     const messageErrorElement = document.getElementById('message-error') as HTMLElement | null;
     
     if (emailErrorElement) {
-      if (emailTouched && !validateEmail()) {
+      // Original logic: show error only when field is touched AND non-empty AND invalid
+      const showEmailError = emailTouched && form.email.trim().length > 0 && !EMAIL_REGEX.test(form.email.trim());
+      if (showEmailError) {
         emailErrorElement.textContent = 'Please enter a valid email address.';
         emailErrorElement.hidden = false;
         const emailInput = document.getElementById('email') as HTMLInputElement | null;
@@ -279,7 +287,9 @@ const initContactForm = () => {
     }
     
     if (messageErrorElement) {
-      if (messageTouched && !validateMessage()) {
+      // Original logic: show error only when field is touched AND non-empty AND invalid
+      const showMessageError = messageTouched && form.message.trim().length > 0 && form.message.trim().length < MIN_MESSAGE_LENGTH;
+      if (showMessageError) {
         messageErrorElement.textContent = `Please enter at least ${MIN_MESSAGE_LENGTH} characters in your message.`;
         messageErrorElement.hidden = false;
         const messageInput = document.getElementById('message') as HTMLTextAreaElement | null;
