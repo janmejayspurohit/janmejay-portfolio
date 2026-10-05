@@ -192,14 +192,25 @@ test.describe('Portfolio Routes', () => {
   test('Resume PDF asset returns correct content type and content', async ({ page }) => {
     await page.goto('/resume');
     
-    const response = await page.request.get('/files/resume-janmejay-v5.pdf');
+    const response = await page.request.get('/files/resume-janmejay.pdf');
     expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).toBe('application/pdf');
-    
+
     // Check that the PDF starts with %PDF
     const body = await response.body();
     const pdfHeader = body.subarray(0, 4).toString('utf-8');
     expect(pdfHeader).toBe('%PDF');
+  });
+
+  test('Resume version stays internal: no versioned link or label anywhere', async ({ page }) => {
+    for (const route of ['/', '/resume']) {
+      await page.goto(route);
+      const html = await page.content();
+      expect(html).not.toMatch(/resume-janmejay-v\d+\.pdf/);
+      expect(html).not.toMatch(/\bv\d+ · PDF\b/);
+    }
+    await page.goto('/');
+    await expect(page.locator('.t-cv')).toHaveAttribute('href', '/files/resume-janmejay.pdf');
   });
 
   test('Theme functionality works correctly', async ({ page }) => {

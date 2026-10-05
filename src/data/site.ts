@@ -5,7 +5,9 @@ export const site = {
   email: 'janmejayspurohit@gmail.com',
   github: 'https://github.com/janmejayspurohit',
   linkedin: 'https://www.linkedin.com/in/jsp324/',
-  resume: '/files/resume-janmejay-v5.pdf',
+  // One unversioned URL; the resume version is internal only. nginx.conf
+  // redirects the old versioned file names here.
+  resume: '/files/resume-janmejay.pdf',
   location: 'United States',
   languages: ['English', 'ಕನ್ನಡ', 'हिंदी', '日本語'],
   ogImage: '/og.png',
