@@ -64,7 +64,7 @@
 
 :root {
   --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: 'PT Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --radius: 18px;
   --radius-sm: 10px;
   --header-h: 64px;

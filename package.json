@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
-    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource/pt-mono": "^5.3.0",
     "@iconify-json/lucide": "^1.2.138",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify/utils": "^3.1.7",
